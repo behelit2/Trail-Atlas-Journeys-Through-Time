@@ -2,6 +2,9 @@
 <!-- TRAIL_ATLAS_REPAIR_V7_APPLIED -->
 <!-- TRAIL_ATLAS_TARGETED_UX_ROUTE_PATCH_V8 -->
 <!-- TRAIL_ATLAS_SCENE_AUDIO_PATCH_V9 -->
+<!-- TRAIL_ATLAS_PLAYABILITY_PATCH_V10 -->
+<!-- TRAIL_ATLAS_PROFESSION_FUNDS_BYLINE_PATCH_V11 -->
+<!-- TRAIL_ATLAS_STARTING_FUNDS_UI_PARITY_PATCH_V12 -->
 <!-- ==========================================================================
      TRAIL ATLAS: JOURNEYS THROUGH TIME
      SECTION 01/20 START
@@ -873,6 +876,16 @@
       letter-spacing: 0.15em;
       line-height: 1.4;
       text-transform: uppercase;
+    }
+
+    .scene-loading__byline {
+      margin: var(--space-1) 0 0;
+      color: #e6dcc3;
+      font-family: var(--font-reading);
+      font-size: clamp(0.82rem, 2.6vw, 1rem);
+      font-weight: 700;
+      letter-spacing: 0.035em;
+      line-height: 1.35;
     }
 
     .scene-loading__rule {
@@ -3935,6 +3948,7 @@
         <div id="scene-loading" class="scene-loading" aria-hidden="true">
           <p class="scene-loading__title">Trail Atlas</p>
           <p class="scene-loading__subtitle">Journeys Through Time</p>
+          <p class="scene-loading__byline">By: Matthew Taraschke</p>
           <span class="scene-loading__rule"></span>
         </div>
 
@@ -10569,7 +10583,7 @@
         unit: "kg",
         unitPlural: "kg",
         weightKg: 1,
-        basePrice: 1.6,
+        basePrice: 0.8,
         quantityStep: 5,
         defaultBundle: 20,
         consumable: true,
@@ -10602,7 +10616,7 @@
         unit: "liter",
         unitPlural: "liters",
         weightKg: 1,
-        basePrice: 0.12,
+        basePrice: 0.08,
         quantityStep: 5,
         defaultBundle: 20,
         consumable: true,
@@ -10617,7 +10631,7 @@
         unit: "kg",
         unitPlural: "kg",
         weightKg: 1,
-        basePrice: 0.65,
+        basePrice: 0.32,
         quantityStep: 5,
         defaultBundle: 20,
         consumable: true,
@@ -10782,12 +10796,12 @@
         unit: "set",
         unitPlural: "sets",
         weightKg: 3,
-        basePrice: 18,
+        basePrice: 12,
         quantityStep: 1,
         defaultBundle: 1,
         durable: true,
         capacity: {
-          waterLiters: 20
+          waterLiters: 30
         },
         tags: ["water", "container"]
       },
@@ -14494,7 +14508,7 @@
         },
         {
           itemId: "water",
-          quantity: 20
+          quantity: 35
         },
         {
           itemId: "water-container",
@@ -15638,7 +15652,7 @@
         },
         {
           itemId: "water",
-          quantity: 25
+          quantity: 50
         },
         {
           itemId: "water-container",
@@ -17888,7 +17902,7 @@
         },
         {
           itemId: "water",
-          quantity: 30
+          quantity: 35
         },
         {
           itemId: "water-container",
@@ -21824,7 +21838,11 @@
         },
         {
           itemId: "water",
-          quantity: 12
+          quantity: 20
+        },
+        {
+          itemId: "water-container",
+          quantity: 1
         },
         {
           itemId: "bedding",
@@ -22911,7 +22929,11 @@
         },
         {
           itemId: "water",
-          quantity: 25
+          quantity: 30
+        },
+        {
+          itemId: "water-container",
+          quantity: 1
         },
         {
           itemId: "clothing",
@@ -23798,7 +23820,11 @@
         },
         {
           itemId: "water",
-          quantity: 10
+          quantity: 20
+        },
+        {
+          itemId: "water-container",
+          quantity: 1
         },
         {
           itemId: "bedding",
@@ -29060,6 +29086,81 @@
       })
     });
 
+
+    /*
+     * TRAIL_ATLAS_PLAYABILITY_PATCH_V10
+     *
+     * One shared balance profile is consumed by itinerary estimation,
+     * movement, fatigue recovery, provisioning, event opportunities, scoring,
+     * and diagnostics. Keeping these assumptions together prevents the
+     * planner and simulator from drifting apart again.
+     */
+    const JOURNEY_BALANCE = Object.freeze({
+      patchVersion:
+        "TRAIL_ATLAS_PLAYABILITY_PATCH_V11",
+
+      travelFatiguePerDay: 5,
+      restRecoveryPerDay: 28,
+      lodgingRecoveryPerDay: 34,
+      waitRecoveryPerDay: 12,
+
+      travelEventRate: 0.10,
+      campEventRate: 0.06,
+      milestoneEventRate: 0.30,
+      afterActionEventRate: 0.06,
+      departureEventRate: 0.08,
+      townEventRate: 0.20,
+      minimumRandomEventGapDays: 3,
+
+      /*
+       * Expected calendar delay from ordinary weather, incident choices,
+       * inspections, and short crossing waits. Forced route incidents remain
+       * in the actual event engine; this coefficient is a planning reserve.
+       */
+      contingencyDaysPerMovementDay: 0.06,
+
+      supplyReserveFactor: 1.10,
+      dryStageStationaryReserveDays: 1,
+
+      routeCompressionMinimum: 1,
+      routeCompressionMaximum: 2,
+
+      startingWaterFloors: Object.freeze({
+        "royal-road": Object.freeze({
+          water: 35,
+          containers: 2
+        }),
+        "silk-roads": Object.freeze({
+          water: 45,
+          containers: 3
+        }),
+        "via-francigena": Object.freeze({
+          water: 20,
+          containers: 1
+        }),
+        "trans-saharan-caravan": Object.freeze({
+          water: 80,
+          containers: 4
+        }),
+        "qhapaq-nan": Object.freeze({
+          water: 30,
+          containers: 1
+        }),
+        "tokaido": Object.freeze({
+          water: 20,
+          containers: 1
+        }),
+        "santa-fe-trail": Object.freeze({
+          water: 50,
+          containers: 2
+        }),
+        "oregon-trail": Object.freeze({
+          water: 35,
+          containers: 1
+        })
+      })
+    });
+
     /* ======================================================================
        01. INVENTORY MODEL
        ====================================================================== */
@@ -31250,6 +31351,755 @@
        06. RUN SELECTORS
        ====================================================================== */
 
+
+    /*
+     * TRAIL_ATLAS_PLAYABILITY_PATCH_V10_ITINERARY
+     *
+     * Route content stores the physical route graph and an authored calendar
+     * target. Segments deliberately compress numerous minor stations and
+     * approaches. This model derives the minimum route-wide compression needed
+     * for Steady travel, planned recovery, and an ordinary delay reserve to
+     * agree with that authored target.
+     *
+     * Longer selected branches retain the same route scale and receive their
+     * actual modeled distance and calendar burden.
+     */
+
+    const routeItineraryCache =
+      new Map();
+
+    function rawRouteSegmentSpeed(
+      route,
+      segment
+    ) {
+      const terrain =
+        content.require(
+          "terrains",
+          segment.terrainId
+        );
+
+      const transport =
+        content.require(
+          "transports",
+          route.transportId
+        );
+
+      const transportModifier =
+        Number(
+          transport
+            .terrainModifiers &&
+          transport
+            .terrainModifiers[
+            segment.terrainId
+          ]
+        ) || 1;
+
+      return Math.max(
+        1,
+        transport
+          .baseSpeedKmPerDay *
+          terrain.movementFactor *
+          transportModifier
+      );
+    }
+
+    function enumerateRouteItineraryPaths(
+      route
+    ) {
+      const index =
+        content.getRouteIndex(
+          route.id
+        );
+
+      const paths = [];
+
+      function walk(
+        milestoneId,
+        segments,
+        visited
+      ) {
+        if (
+          milestoneId ===
+          route.destinationMilestoneId
+        ) {
+          paths.push(
+            segments.slice()
+          );
+
+          return;
+        }
+
+        for (
+          const segment of
+          index.outgoing(
+            milestoneId
+          )
+        ) {
+          if (
+            visited.has(
+              segment.to
+            )
+          ) {
+            continue;
+          }
+
+          const nextVisited =
+            new Set(visited);
+
+          nextVisited.add(
+            segment.to
+          );
+
+          walk(
+            segment.to,
+            [
+              ...segments,
+              segment
+            ],
+            nextVisited
+          );
+        }
+      }
+
+      walk(
+        route.startMilestoneId,
+        [],
+        new Set([
+          route.startMilestoneId
+        ])
+      );
+
+      if (!paths.length) {
+        throw new SimulationError(
+          `Route "${route.id}" has no complete itinerary path.`,
+          {
+            code:
+              "ROUTE_ITINERARY_MISSING",
+            details: {
+              routeId:
+                route.id
+            }
+          }
+        );
+      }
+
+      return paths;
+    }
+
+    function rawItineraryPathProfile(
+      route,
+      segments
+    ) {
+      let distanceKm = 0;
+      let movementDays = 0;
+      let restDays = 0;
+
+      for (
+        const segment of
+        segments
+      ) {
+        const terrain =
+          content.require(
+            "terrains",
+            segment.terrainId
+          );
+
+        const segmentMovementDays =
+          segment.distanceKm /
+          rawRouteSegmentSpeed(
+            route,
+            segment
+          );
+
+        const segmentRestDays =
+          (
+            segmentMovementDays *
+            JOURNEY_BALANCE
+              .travelFatiguePerDay *
+            terrain.fatigueFactor
+          ) /
+          JOURNEY_BALANCE
+            .restRecoveryPerDay;
+
+        distanceKm +=
+          segment.distanceKm;
+
+        movementDays +=
+          segmentMovementDays;
+
+        restDays +=
+          segmentRestDays;
+      }
+
+      const contingencyDays =
+        movementDays *
+        JOURNEY_BALANCE
+          .contingencyDaysPerMovementDay;
+
+      return {
+        segmentIds:
+          segments.map(
+            (segment) =>
+              segment.id
+          ),
+        distanceKm:
+          util.roundTo(
+            distanceKm,
+            3
+          ),
+        rawMovementDays:
+          movementDays,
+        rawRestDays:
+          restDays,
+        rawContingencyDays:
+          contingencyDays,
+        rawCalendarDays:
+          movementDays +
+          restDays +
+          contingencyDays
+      };
+    }
+
+    function routeItineraryCalibration(
+      routeOrId
+    ) {
+      const route =
+        typeof routeOrId ===
+          "string"
+          ? content.require(
+              "routes",
+              routeOrId
+            )
+          : routeOrId;
+
+      if (
+        routeItineraryCache.has(
+          route.id
+        )
+      ) {
+        return routeItineraryCache.get(
+          route.id
+        );
+      }
+
+      const rawProfiles =
+        enumerateRouteItineraryPaths(
+          route
+        )
+          .map(
+            (segments) =>
+              rawItineraryPathProfile(
+                route,
+                segments
+              )
+          )
+          .sort(
+            (first, second) =>
+              first.distanceKm -
+                second.distanceKm ||
+              first.rawCalendarDays -
+                second.rawCalendarDays
+          );
+
+      const rawBaseline =
+        rawProfiles[0];
+
+      const authoredTarget =
+        Math.max(
+          1,
+          Number(
+            route.scoreProfile &&
+            route.scoreProfile
+              .targetDays
+          ) ||
+          Number(
+            route.estimatedDays &&
+            route.estimatedDays[0]
+          ) ||
+          rawBaseline
+            .rawCalendarDays
+        );
+
+      const scale =
+        util.clamp(
+          rawBaseline
+            .rawCalendarDays /
+            authoredTarget,
+          JOURNEY_BALANCE
+            .routeCompressionMinimum,
+          JOURNEY_BALANCE
+            .routeCompressionMaximum
+        );
+
+      const paths =
+        rawProfiles.map(
+          (profile) => {
+            const movementDays =
+              profile
+                .rawMovementDays /
+              scale;
+
+            const restDays =
+              profile
+                .rawRestDays /
+              scale;
+
+            const contingencyDays =
+              profile
+                .rawContingencyDays /
+              scale;
+
+            return {
+              segmentIds:
+                profile
+                  .segmentIds
+                  .slice(),
+              distanceKm:
+                profile
+                  .distanceKm,
+              movementDays:
+                util.roundTo(
+                  movementDays,
+                  4
+                ),
+              restDays:
+                util.roundTo(
+                  restDays,
+                  4
+                ),
+              contingencyDays:
+                util.roundTo(
+                  contingencyDays,
+                  4
+                ),
+              calendarDays:
+                util.roundTo(
+                  movementDays +
+                  restDays +
+                  contingencyDays,
+                  4
+                )
+            };
+          }
+        );
+
+      const baseline =
+        paths[0];
+
+      const baseTargetDays =
+        Math.max(
+          authoredTarget,
+          Math.ceil(
+            baseline
+              .calendarDays -
+            0.0001
+          )
+        );
+
+      const maximumExtraDays =
+        paths.reduce(
+          (maximum, profile) =>
+            Math.max(
+              maximum,
+              Math.ceil(
+                Math.max(
+                  0,
+                  profile
+                    .calendarDays -
+                    baseline
+                      .calendarDays
+                ) -
+                0.0001
+              )
+            ),
+          0
+        );
+
+      const result =
+        util.deepFreeze({
+          routeId:
+            route.id,
+          scale:
+            util.roundTo(
+              scale,
+              6
+            ),
+          authoredTargetDays:
+            authoredTarget,
+          baseTargetDays,
+          baseline,
+          paths,
+          distanceRangeKm: [
+            Math.min(
+              ...paths.map(
+                (profile) =>
+                  profile.distanceKm
+              )
+            ),
+            Math.max(
+              ...paths.map(
+                (profile) =>
+                  profile.distanceKm
+              )
+            )
+          ],
+          estimatedDaysRange: [
+            Number(
+              route.estimatedDays[0]
+            ),
+            Math.max(
+              Number(
+                route.estimatedDays[1]
+              ),
+              Math.ceil(
+                baseline
+                  .calendarDays
+              )
+            ) +
+            maximumExtraDays
+          ],
+          maximumExtraDays
+        });
+
+      routeItineraryCache.set(
+        route.id,
+        result
+      );
+
+      return result;
+    }
+
+    function itineraryPathMatchesRun(
+      path,
+      run
+    ) {
+      const historyIds =
+        (
+          run.progress
+            .pathHistory ||
+          []
+        ).map(
+          (entry) =>
+            entry.segmentId
+        );
+
+      for (
+        let index = 0;
+        index < historyIds.length;
+        index += 1
+      ) {
+        if (
+          path.segmentIds[index] !==
+          historyIds[index]
+        ) {
+          return false;
+        }
+      }
+
+      const branchSegmentIds =
+        Object.values(
+          run.progress
+            .branchChoices ||
+            {}
+        )
+          .map(
+            (choice) =>
+              choice &&
+              choice.segmentId
+          )
+          .filter(Boolean);
+
+      return branchSegmentIds.every(
+        (segmentId) =>
+          path.segmentIds.includes(
+            segmentId
+          )
+      );
+    }
+
+    function selectedRunItinerary(
+      run
+    ) {
+      const route =
+        content.require(
+          "routes",
+          run.routeId
+        );
+
+      const calibration =
+        routeItineraryCalibration(
+          route
+        );
+
+      const compatible =
+        calibration.paths
+          .filter(
+            (path) =>
+              itineraryPathMatchesRun(
+                path,
+                run
+              )
+          )
+          .slice()
+          .sort(
+            (first, second) =>
+              first.calendarDays -
+                second.calendarDays ||
+              first.distanceKm -
+                second.distanceKm
+          );
+
+      const selected =
+        compatible[0] ||
+        calibration.baseline;
+
+      const extraTargetDays =
+        Math.ceil(
+          Math.max(
+            0,
+            selected.calendarDays -
+              calibration
+                .baseline
+                .calendarDays
+          ) -
+          0.0001
+        );
+
+      const authoredEstimated =
+        route.estimatedDays;
+
+      const estimatedDays = [
+        Number(
+          authoredEstimated[0]
+        ) +
+        extraTargetDays,
+        Math.max(
+          Number(
+            authoredEstimated[1]
+          ),
+          Math.ceil(
+            calibration
+              .baseline
+              .calendarDays
+          )
+        ) +
+        extraTargetDays
+      ];
+
+      const distanceKm =
+        selected.distanceKm;
+
+      const traveledKm =
+        Number(
+          run.progress
+            .distanceTraveledKm
+        ) || 0;
+
+      return {
+        routeId:
+          route.id,
+        routeScale:
+          calibration.scale,
+        segmentIds:
+          selected
+            .segmentIds
+            .slice(),
+        distanceKm,
+        movementDays:
+          selected
+            .movementDays,
+        plannedRestDays:
+          selected
+            .restDays,
+        contingencyDays:
+          selected
+            .contingencyDays,
+        calendarDays:
+          selected
+            .calendarDays,
+        targetDays:
+          calibration
+            .baseTargetDays +
+          extraTargetDays,
+        authoredTargetDays:
+          calibration
+            .authoredTargetDays,
+        extraTargetDays:
+          (
+            calibration
+              .baseTargetDays -
+            calibration
+              .authoredTargetDays
+          ) +
+          extraTargetDays,
+        branchExtraDays:
+          extraTargetDays,
+        estimatedDays,
+        fraction:
+          distanceKm > 0
+            ? util.clamp(
+                traveledKm /
+                distanceKm,
+              0,
+              1
+            )
+            : 0,
+        remainingDistanceKm:
+          util.roundTo(
+            Math.max(
+              0,
+              distanceKm -
+              traveledKm
+            ),
+            3
+          )
+      };
+    }
+
+    function routeItineraryRange(
+      routeId
+    ) {
+      const route =
+        content.require(
+          "routes",
+          routeId
+        );
+
+      const calibration =
+        routeItineraryCalibration(
+          route
+        );
+
+      return {
+        routeId:
+          route.id,
+        routeScale:
+          calibration.scale,
+        distanceRangeKm:
+          calibration
+            .distanceRangeKm
+            .slice(),
+        estimatedDays:
+          calibration
+            .estimatedDaysRange
+            .slice(),
+        targetDaysRange: [
+          calibration
+            .baseTargetDays,
+          calibration
+            .baseTargetDays +
+            calibration
+              .maximumExtraDays
+        ],
+        pathCount:
+          calibration
+            .paths.length,
+        paths:
+          calibration.paths.map(
+            (path) => ({
+              segmentIds:
+                path
+                  .segmentIds
+                  .slice(),
+              distanceKm:
+                path.distanceKm,
+              movementDays:
+                path.movementDays,
+              restDays:
+                path.restDays,
+              contingencyDays:
+                path
+                  .contingencyDays,
+              calendarDays:
+                path.calendarDays
+            })
+          )
+      };
+    }
+
+    function segmentPlanningProfile(
+      run,
+      segment
+    ) {
+      const route =
+        content.require(
+          "routes",
+          run.routeId
+        );
+
+      const terrain =
+        content.require(
+          "terrains",
+          segment.terrainId
+        );
+
+      const calibration =
+        routeItineraryCalibration(
+          route
+        );
+
+      const speedKmPerDay =
+        rawRouteSegmentSpeed(
+          route,
+          segment
+        ) *
+        calibration.scale;
+
+      const movementDays =
+        Math.max(
+          0.25,
+          segment.distanceKm /
+          speedKmPerDay
+        );
+
+      const restDays =
+        (
+          movementDays *
+          JOURNEY_BALANCE
+            .travelFatiguePerDay *
+          terrain.fatigueFactor
+        ) /
+        JOURNEY_BALANCE
+          .restRecoveryPerDay;
+
+      const contingencyDays =
+        movementDays *
+        JOURNEY_BALANCE
+          .contingencyDaysPerMovementDay;
+
+      return {
+        routeScale:
+          calibration.scale,
+        speedKmPerDay:
+          util.roundTo(
+            speedKmPerDay,
+            5
+          ),
+        movementDays:
+          util.roundTo(
+            movementDays,
+            5
+          ),
+        restDays:
+          util.roundTo(
+            restDays,
+            5
+          ),
+        contingencyDays:
+          util.roundTo(
+            contingencyDays,
+            5
+          ),
+        calendarDays:
+          util.roundTo(
+            movementDays +
+            restDays +
+            contingencyDays,
+            5
+          )
+      };
+    }
+
     function requireRun(run) {
       if (
         !run ||
@@ -31497,6 +32347,11 @@
       const supplies =
         supplyForecast(run);
 
+      const itinerary =
+        selectedRunItinerary(
+          run
+        );
+
       return {
         id: run.id,
         expeditionName:
@@ -31527,6 +32382,18 @@
         distanceTraveledKm:
           run.progress
             .distanceTraveledKm,
+        routeDistanceKm:
+          itinerary.distanceKm,
+        routeProgress:
+          itinerary.fraction,
+        targetDays:
+          itinerary.targetDays,
+        estimatedDays:
+          itinerary
+            .estimatedDays
+            .slice(),
+        routeScale:
+          itinerary.routeScale,
         alive:
           aliveMembers(run).length,
         lost:
@@ -31575,6 +32442,14 @@
         scoreMultiplier,
         dailyNeeds,
         supplyForecast,
+        itinerary:
+          selectedRunItinerary,
+        itineraryRange:
+          routeItineraryRange,
+        routeCalibration:
+          routeItineraryCalibration,
+        segmentPlanning:
+          segmentPlanningProfile,
         loadState:
           transportLoadState,
         waterCapacity:
@@ -32796,6 +33671,9 @@
 
         flags: {
           legacyEnabled,
+          balanceVersion:
+            JOURNEY_BALANCE
+              .patchVersion,
           learningRescueTokens:
             mode.rescueTokens,
           departed: false,
@@ -33070,6 +33948,207 @@
       };
     }
 
+
+    function reconcilePlayabilityBalance(
+      run
+    ) {
+      if (
+        !run ||
+        !util.isPlainObject(
+          run
+        )
+      ) {
+        return {
+          changed: false,
+          reason:
+            "no-run"
+        };
+      }
+
+      if (
+        !run.flags
+      ) {
+        run.flags = {};
+      }
+
+      if (
+        run.flags
+          .balanceVersion ===
+        JOURNEY_BALANCE
+          .patchVersion
+      ) {
+        return {
+          changed: false,
+          reason:
+            "already-current"
+        };
+      }
+
+      const changes = [];
+
+      if (
+        run.status ===
+          "outfitting" &&
+        !run.flags.departed
+      ) {
+        const floor =
+          JOURNEY_BALANCE
+            .startingWaterFloors[
+            run.routeId
+          ];
+
+        if (floor) {
+          const currentWater =
+            itemQuantity(
+              run.inventory,
+              "water"
+            );
+
+          if (
+            currentWater <
+            floor.water
+          ) {
+            const amount =
+              floor.water -
+              currentWater;
+
+            addItem(
+              run.inventory,
+              "water",
+              amount,
+              {
+                source:
+                  "balance-v10-kit-reconciliation",
+                acquiredDay: 0,
+                unitCost: 0,
+                quality: 100,
+                metadata: {
+                  balancePatch:
+                    JOURNEY_BALANCE
+                      .patchVersion
+                }
+              }
+            );
+
+            if (
+              run.setup &&
+              run.setup
+                .initialInventory
+            ) {
+              addItem(
+                run.setup
+                  .initialInventory,
+                "water",
+                amount,
+                {
+                  source:
+                    "balance-v10-kit-reconciliation",
+                  acquiredDay: 0,
+                  unitCost: 0,
+                  quality: 100,
+                  metadata: {
+                    balancePatch:
+                      JOURNEY_BALANCE
+                        .patchVersion
+                  }
+                }
+              );
+            }
+
+            changes.push({
+              itemId: "water",
+              quantity:
+                util.roundTo(
+                  amount,
+                  3
+                )
+            });
+          }
+
+          const currentContainers =
+            itemQuantity(
+              run.inventory,
+              "water-container"
+            );
+
+          if (
+            currentContainers <
+            floor.containers
+          ) {
+            const amount =
+              floor.containers -
+              currentContainers;
+
+            addItem(
+              run.inventory,
+              "water-container",
+              amount,
+              {
+                source:
+                  "balance-v10-kit-reconciliation",
+                acquiredDay: 0,
+                unitCost: 0,
+                quality: 100,
+                metadata: {
+                  balancePatch:
+                    JOURNEY_BALANCE
+                      .patchVersion
+                }
+              }
+            );
+
+            if (
+              run.setup &&
+              run.setup
+                .initialInventory
+            ) {
+              addItem(
+                run.setup
+                  .initialInventory,
+                "water-container",
+                amount,
+                {
+                  source:
+                    "balance-v10-kit-reconciliation",
+                  acquiredDay: 0,
+                  unitCost: 0,
+                  quality: 100,
+                  metadata: {
+                    balancePatch:
+                      JOURNEY_BALANCE
+                        .patchVersion
+                  }
+                }
+              );
+            }
+
+            changes.push({
+              itemId:
+                "water-container",
+              quantity:
+                util.roundTo(
+                  amount,
+                  3
+                )
+            });
+          }
+        }
+      }
+
+      run.flags.balanceVersion =
+        JOURNEY_BALANCE
+          .patchVersion;
+
+      return {
+        changed:
+          changes.length > 0,
+        changes,
+        version:
+          JOURNEY_BALANCE
+            .patchVersion
+      };
+    }
+
     const RunFactory =
       Object.freeze({
         create: createRun,
@@ -33077,6 +34156,8 @@
           installNewRun,
         preview:
           createSetupPreview,
+        reconcileBalance:
+          reconcilePlayabilityBalance,
         generateNames(
           routeId,
           seed,
@@ -33108,6 +34189,7 @@
     const runModel =
       Object.freeze({
         RUN_SCHEMA_VERSION,
+        JOURNEY_BALANCE,
         RUN_STATUSES,
         RUN_PHASES,
         PACE_POLICIES,
@@ -33132,6 +34214,12 @@
       });
 
     Object.defineProperties(TA, {
+      journeyBalance: {
+        value:
+          JOURNEY_BALANCE,
+        writable: false,
+        enumerable: true
+      },
       runModel: {
         value: runModel,
         writable: false,
@@ -33704,6 +34792,9 @@
       selectors
     } = runModel;
 
+    const STARTING_FUNDS_BALANCE_VERSION =
+      "TRAIL_ATLAS_STARTING_FUNDS_PATCH_V11";
+
     const CONTROLLED_ROUTE_TYPES = new Set([
       "imperial-road-network",
       "pilgrimage-road-network",
@@ -33892,13 +34983,12 @@
           ]
         ) || 1;
 
-      return Math.max(
-        1,
-        transportType
-          .baseSpeedKmPerDay *
-          terrain.movementFactor *
-          transportModifier
-      );
+      return selectors
+        .segmentPlanning(
+          run,
+          segment
+        )
+        .speedKmPerDay;
     }
 
     function findNextMarketPath(
@@ -34054,16 +35144,10 @@
             )
         );
 
-      const estimatedDays =
-        segments.reduce(
-          (total, segment) =>
-            total +
-            segment.distanceKm /
-              planningSegmentSpeed(
-                run,
-                segment
-              ),
-          0
+      const reservePlan =
+        segmentReservePlan(
+          run,
+          segments
         );
 
       return {
@@ -34076,10 +35160,17 @@
             targetId
           ),
         estimatedDays:
-          util.roundTo(
-            estimatedDays,
-            1
-          ),
+          reservePlan
+            .calendarDays,
+        movementDays:
+          reservePlan
+            .movementDays,
+        plannedRestDays:
+          reservePlan
+            .restDays,
+        contingencyDays:
+          reservePlan
+            .contingencyDays,
         segmentIds,
         segments
       };
@@ -34235,25 +35326,36 @@
       let fodderKg = 0;
       let currentWaterLiters = 0;
       let maximumWaterLiters = 0;
-      let nominalDays = 0;
+      let totalWaterConsumptionLiters = 0;
+      let movementDays = 0;
+      let restDays = 0;
+      let contingencyDays = 0;
       let serviceDays = 0;
+      let maximumDailyCarriedWater = 0;
+      let maximumDailyCarriedFodder = 0;
 
       for (
         const segment of
         segments || []
       ) {
-        const speed =
-          planningSegmentSpeed(
+        const planning =
+          selectors.segmentPlanning(
             run,
             segment
           );
 
-        const segmentNominalDays =
-          Math.max(
-            0.25,
-            segment.distanceKm /
-              speed
-          );
+        const segmentMovementDays =
+          planning.movementDays;
+
+        const segmentRestDays =
+          planning.restDays;
+
+        const segmentContingencyDays =
+          planning.contingencyDays;
+
+        const segmentStationaryDays =
+          segmentRestDays +
+          segmentContingencyDays;
 
         const declaredServiceGap =
           Math.max(
@@ -34261,24 +35363,23 @@
             Number(
               segment.serviceGapDays
             ) ||
-              segmentNominalDays
+              segmentMovementDays
           );
 
         /*
-         * serviceGapDays is the maximum represented carried-supply interval
-         * inside a composite segment. Slower-than-nominal travel still costs
-         * more because the travel engine applies this as a per-day factor.
+         * serviceGapDays describes the maximum represented movement interval
+         * between minor sources, stops, grazing opportunities, or assistance.
          */
         const representedServiceDays =
           Math.min(
-            segmentNominalDays,
+            segmentMovementDays,
             declaredServiceGap
           );
 
         const serviceScale =
           util.clamp(
             representedServiceDays /
-              segmentNominalDays,
+              segmentMovementDays,
             0.08,
             1
           );
@@ -34312,7 +35413,12 @@
             0.92
           );
 
-        const segmentWaterLiters =
+        /*
+         * Movement days receive the compressed-route source credit. Recovery
+         * and delay days do not receive that credit, but they still retain the
+         * segment's direct environmental water and grazing availability.
+         */
+        const movementWaterLiters =
           adjustedWater.totalLiters *
           (
             1 -
@@ -34320,7 +35426,26 @@
           ) *
           representedServiceDays;
 
-        const segmentFodderKg =
+        const stationaryWaterLiters =
+          adjustedWater.totalLiters *
+          (
+            1 -
+            waterAccess
+          ) *
+          segmentStationaryDays;
+
+        const segmentWaterLiters =
+          movementWaterLiters +
+          stationaryWaterLiters;
+
+        const dailyCarriedWater =
+          adjustedWater.totalLiters *
+          (
+            1 -
+            waterAccess
+          );
+
+        const movementFodderKg =
           needs.fodderKg *
           (
             1 -
@@ -34328,13 +35453,32 @@
           ) *
           representedServiceDays;
 
-        /*
-         * Food remains tied to the full nominal calendar duration. Only water
-         * and fodder receive the composite-route access credit.
-         */
+        const stationaryFodderKg =
+          needs.fodderKg *
+          (
+            1 -
+            grazingFactor
+          ) *
+          segmentStationaryDays;
+
+        const segmentFodderKg =
+          movementFodderKg +
+          stationaryFodderKg;
+
+        const dailyCarriedFodder =
+          needs.fodderKg *
+          (
+            1 -
+            grazingFactor
+          );
+
+        const segmentCalendarDays =
+          segmentMovementDays +
+          segmentStationaryDays;
+
         const segmentFoodKg =
           needs.foodKg *
-          segmentNominalDays;
+          segmentCalendarDays;
 
         currentWaterLiters +=
           segmentWaterLiters;
@@ -34343,6 +35487,21 @@
           Math.max(
             maximumWaterLiters,
             currentWaterLiters
+          );
+
+        totalWaterConsumptionLiters +=
+          segmentWaterLiters;
+
+        maximumDailyCarriedWater =
+          Math.max(
+            maximumDailyCarriedWater,
+            dailyCarriedWater
+          );
+
+        maximumDailyCarriedFodder =
+          Math.max(
+            maximumDailyCarriedFodder,
+            dailyCarriedFodder
           );
 
         const destination =
@@ -34364,8 +35523,14 @@
         fodderKg +=
           segmentFodderKg;
 
-        nominalDays +=
-          segmentNominalDays;
+        movementDays +=
+          segmentMovementDays;
+
+        restDays +=
+          segmentRestDays;
+
+        contingencyDays +=
+          segmentContingencyDays;
 
         serviceDays +=
           representedServiceDays;
@@ -34373,9 +35538,29 @@
         details.push({
           segmentId:
             segment.id,
+          movementDays:
+            util.roundTo(
+              segmentMovementDays,
+              3
+            ),
           nominalDays:
             util.roundTo(
-              segmentNominalDays,
+              segmentMovementDays,
+              3
+            ),
+          restDays:
+            util.roundTo(
+              segmentRestDays,
+              3
+            ),
+          contingencyDays:
+            util.roundTo(
+              segmentContingencyDays,
+              3
+            ),
+          calendarDays:
+            util.roundTo(
+              segmentCalendarDays,
               3
             ),
           serviceDays:
@@ -34404,6 +35589,16 @@
               grazingFactor,
               4
             ),
+          movementWaterLiters:
+            util.roundTo(
+              movementWaterLiters,
+              2
+            ),
+          stationaryWaterLiters:
+            util.roundTo(
+              stationaryWaterLiters,
+              2
+            ),
           waterLiters:
             util.roundTo(
               segmentWaterLiters,
@@ -34423,16 +35618,59 @@
         });
       }
 
+      const dryStageReserveDays =
+        details.length
+          ? runModel
+              .JOURNEY_BALANCE
+              .dryStageStationaryReserveDays
+          : 0;
+
+      /*
+       * One full stationary day is reserved at the driest represented point.
+       * This covers a forced wait, crossing interruption, short illness, or
+       * repair without pretending that stationary days retain movement credit.
+       */
+      const dryStageWaterReserve =
+        maximumDailyCarriedWater *
+        dryStageReserveDays;
+
+      const dryStageFodderReserve =
+        maximumDailyCarriedFodder *
+        dryStageReserveDays;
+
+      const dryStageFoodReserve =
+        needs.foodKg *
+        dryStageReserveDays;
+
       maximumWaterLiters =
         Math.max(
           maximumWaterLiters,
           currentWaterLiters
-        );
+        ) +
+        dryStageWaterReserve;
+
+      totalWaterConsumptionLiters +=
+        dryStageWaterReserve;
+
+      foodKg +=
+        dryStageFoodReserve;
+
+      fodderKg +=
+        dryStageFodderReserve;
+
+      const calendarDays =
+        movementDays +
+        restDays +
+        contingencyDays +
+        dryStageReserveDays;
 
       return {
         foodKg:
           util.roundTo(
-            foodKg * 1.1,
+            foodKg *
+              runModel
+                .JOURNEY_BALANCE
+                .supplyReserveFactor,
             2
           ),
         waterLiters:
@@ -34441,14 +35679,41 @@
               1.05,
             2
           ),
+        waterConsumptionLiters:
+          util.roundTo(
+            totalWaterConsumptionLiters *
+              1.05,
+            2
+          ),
         fodderKg:
           util.roundTo(
             fodderKg * 1.05,
             2
           ),
+        movementDays:
+          util.roundTo(
+            movementDays,
+            2
+          ),
         nominalDays:
           util.roundTo(
-            nominalDays,
+            movementDays,
+            2
+          ),
+        restDays:
+          util.roundTo(
+            restDays,
+            2
+          ),
+        contingencyDays:
+          util.roundTo(
+            contingencyDays +
+              dryStageReserveDays,
+            2
+          ),
+        calendarDays:
+          util.roundTo(
+            calendarDays,
             2
           ),
         serviceDays:
@@ -34456,9 +35721,11 @@
             serviceDays,
             2
           ),
+        dryStageReserveDays,
         details
       };
     }
+
 
     function pathsToNextMarkets(
       run,
@@ -34603,52 +35870,90 @@
         return {
           foodKg: 0,
           waterLiters: 0,
+          waterConsumptionLiters: 0,
           fodderKg: 0,
+          movementDays: 0,
           nominalDays: 0,
+          restDays: 0,
+          contingencyDays: 0,
+          calendarDays: 0,
           serviceDays: 0,
           paths: []
         };
       }
 
+      const maximum =
+        (field) =>
+          Math.max(
+            ...plans.map(
+              (plan) =>
+                Number(
+                  plan[field]
+                ) || 0
+            )
+          );
+
       return {
         foodKg:
-          Math.max(
-            ...plans.map(
-              (plan) =>
-                plan.foodKg
-            )
+          maximum(
+            "foodKg"
           ),
         waterLiters:
-          Math.max(
-            ...plans.map(
-              (plan) =>
-                plan
-                  .waterLiters
-            )
+          maximum(
+            "waterLiters"
+          ),
+        waterConsumptionLiters:
+          maximum(
+            "waterConsumptionLiters"
           ),
         fodderKg:
-          Math.max(
-            ...plans.map(
-              (plan) =>
-                plan.fodderKg
-            )
+          maximum(
+            "fodderKg"
+          ),
+        movementDays:
+          maximum(
+            "movementDays"
           ),
         nominalDays:
-          Math.max(
-            ...plans.map(
-              (plan) =>
-                plan.nominalDays
-            )
+          maximum(
+            "nominalDays"
+          ),
+        restDays:
+          maximum(
+            "restDays"
+          ),
+        contingencyDays:
+          maximum(
+            "contingencyDays"
+          ),
+        calendarDays:
+          maximum(
+            "calendarDays"
           ),
         serviceDays:
-          Math.max(
-            ...plans.map(
-              (plan) =>
-                plan.serviceDays
-            )
+          maximum(
+            "serviceDays"
           ),
         paths: plans
       };
+    }
+
+
+    function waterContainerCapacityLiters() {
+      const item =
+        content.require(
+          "items",
+          "water-container"
+        );
+
+      return Math.max(
+        1,
+        Number(
+          item.capacity &&
+          item.capacity
+            .waterLiters
+        ) || 20
+      );
     }
 
     function essentialMarketStockFloors(
@@ -34716,7 +36021,7 @@
                 plan.waterLiters -
                   currentWaterCapacity
               ) /
-                20
+                waterContainerCapacityLiters()
             )
           )
       };
@@ -35163,7 +36468,7 @@
                 run.transport
                   .baseWaterCapacityLiters
             ) /
-              20
+              waterContainerCapacityLiters()
           )
         );
 
@@ -35379,6 +36684,1492 @@
       return recommendations;
     }
 
+
+    /*
+     * TRAIL_ATLAS_PROFESSION_FUNDS_BYLINE_PATCH_V11_BUDGET
+     *
+     * Profession wealth remains meaningful, but no profession may begin a
+     * route with less purchasing power than the route's own sustainable plan
+     * requires. Support is finite, route-derived, recorded, and calculated
+     * from the most demanding valid branch.
+     */
+
+    function destinationPathsFrom(
+      run,
+      startMilestoneId =
+        run.progress
+          .currentMilestoneId
+    ) {
+      const route =
+        selectors.route(run);
+
+      const index =
+        content.getRouteIndex(
+          route.id
+        );
+
+      const paths = [];
+
+      function walk(
+        milestoneId,
+        segments,
+        visited
+      ) {
+        if (
+          milestoneId ===
+          route.destinationMilestoneId
+        ) {
+          paths.push(
+            segments.slice()
+          );
+
+          return;
+        }
+
+        for (
+          const segment of
+          index.outgoing(
+            milestoneId
+          )
+        ) {
+          if (
+            visited.has(
+              segment.to
+            )
+          ) {
+            continue;
+          }
+
+          const nextVisited =
+            new Set(visited);
+
+          nextVisited.add(
+            segment.to
+          );
+
+          walk(
+            segment.to,
+            [
+              ...segments,
+              segment
+            ],
+            nextVisited
+          );
+        }
+      }
+
+      walk(
+        startMilestoneId,
+        [],
+        new Set([
+          startMilestoneId
+        ])
+      );
+
+      return paths;
+    }
+
+    function marketUnitPrice(
+      visit,
+      itemId
+    ) {
+      const listed =
+        visit.prices &&
+        visit.prices[
+          itemId
+        ];
+
+      if (
+        listed &&
+        Number.isFinite(
+          listed.buy
+        )
+      ) {
+        return listed.buy;
+      }
+
+      return content.require(
+        "items",
+        itemId
+      ).basePrice;
+    }
+
+    /*
+     * TRAIL_ATLAS_PROFESSION_FUNDS_BYLINE_PATCH_V11
+     *
+     * The sustainable journey budget must not erase the authored wealth
+     * differences between professions. The V10 calculation used each
+     * profession's current inventory, so valuable starting kits could produce
+     * different cash floors and invert the intended profession ordering.
+     *
+     * The V11 plan calculates one profession-neutral sustainable cash floor
+     * from the route's shared base kit. Each profession then retains its
+     * authored cash advantage above the poorest profession. The poorest
+     * profession remains fully viable, while richer professions again receive
+     * meaningful discretionary cash.
+     */
+
+    function neutralMarketUnitPrice(
+      run,
+      visit,
+      itemId
+    ) {
+      const listedPrice =
+        marketUnitPrice(
+          visit,
+          itemId
+        );
+
+      const profession =
+        selectors.profession(
+          run
+        );
+
+      /*
+       * Market Appraisal applies a four-percent purchase discount. Undo that
+       * discount only for the shared budget-floor calculation so every
+       * profession on the same route, mode, and seed receives the same
+       * sustainable baseline. The Merchant still receives the actual discount
+       * when purchasing.
+       */
+      const appraisalFactor =
+        profession.perks.includes(
+          "market-appraisal"
+        )
+          ? 0.96
+          : 1;
+
+      return listedPrice /
+        appraisalFactor;
+    }
+
+    function routeBaseKitQuantities(
+      route
+    ) {
+      const quantities = {};
+
+      for (
+        const entry of
+        route.baseKit || []
+      ) {
+        quantities[
+          entry.itemId
+        ] =
+          (
+            Number(
+              quantities[
+                entry.itemId
+              ]
+            ) || 0
+          ) +
+          (
+            Number(
+              entry.quantity
+            ) || 0
+          );
+      }
+
+      return quantities;
+    }
+
+    function fullJourneyBudgetPlan(
+      run,
+      visit
+    ) {
+      const route =
+        selectors.route(run);
+
+      const paths =
+        destinationPathsFrom(
+          run,
+          route.startMilestoneId
+        );
+
+      const pathPlans =
+        paths.map(
+          (segments) => ({
+            segmentIds:
+              segments.map(
+                (segment) =>
+                  segment.id
+              ),
+            ...segmentReservePlan(
+              run,
+              segments
+            )
+          })
+        );
+
+      const maximum =
+        (field) =>
+          pathPlans.length
+            ? Math.max(
+                ...pathPlans.map(
+                  (plan) =>
+                    Number(
+                      plan[field]
+                    ) || 0
+                )
+              )
+            : 0;
+
+      const recommendations =
+        createRecommendations(
+          run
+        );
+
+      /*
+       * Only the route base kit is common to every profession. Profession
+       * starter items remain genuine profession benefits, but they no longer
+       * lower that profession's cash floor and accidentally invert cash rank.
+       */
+      const baseKit =
+        routeBaseKitQuantities(
+          route
+        );
+
+      const baseQuantity =
+        (itemId) =>
+          Number(
+            baseKit[
+              itemId
+            ]
+          ) || 0;
+
+      let recommendationCost = 0;
+
+      const recommendedShortages =
+        {};
+
+      for (
+        const recommendation of
+        recommendations
+      ) {
+        const shortage =
+          Math.max(
+            0,
+            Number(
+              recommendation
+                .recommendedQuantity
+            ) -
+            baseQuantity(
+              recommendation
+                .itemId
+            )
+          );
+
+        recommendedShortages[
+          recommendation.itemId
+        ] =
+          shortage;
+
+        recommendationCost +=
+          shortage *
+          neutralMarketUnitPrice(
+            run,
+            visit,
+            recommendation.itemId
+          );
+      }
+
+      const totalFoodTarget =
+        maximum(
+          "foodKg"
+        );
+
+      const totalWaterTarget =
+        maximum(
+          "waterConsumptionLiters"
+        );
+
+      const totalFodderTarget =
+        maximum(
+          "fodderKg"
+        );
+
+      const currentFood =
+        baseQuantity(
+          "staple-food"
+        ) +
+        baseQuantity(
+          "fresh-food"
+        );
+
+      const currentWater =
+        baseQuantity(
+          "water"
+        );
+
+      const currentFodder =
+        baseQuantity(
+          "fodder"
+        );
+
+      const additionalFood =
+        Math.max(
+          0,
+          totalFoodTarget -
+            currentFood -
+            (
+              recommendedShortages[
+                "staple-food"
+              ] || 0
+            )
+        );
+
+      const additionalWater =
+        Math.max(
+          0,
+          totalWaterTarget -
+            currentWater -
+            (
+              recommendedShortages
+                .water || 0
+            )
+        );
+
+      const additionalFodder =
+        Math.max(
+          0,
+          totalFodderTarget -
+            currentFodder -
+            (
+              recommendedShortages
+                .fodder || 0
+            )
+        );
+
+      const continuingConsumablesCost =
+        (
+          additionalFood *
+            neutralMarketUnitPrice(
+              run,
+              visit,
+              "staple-food"
+            ) +
+          additionalWater *
+            neutralMarketUnitPrice(
+              run,
+              visit,
+              "water"
+            ) +
+          additionalFodder *
+            neutralMarketUnitPrice(
+              run,
+              visit,
+              "fodder"
+            )
+        ) *
+        1.5;
+
+      const feeReserve =
+        route.economy
+          .baseFunds *
+        0.15;
+
+      const minimumJourneyBudget =
+        currencyRound(
+          run,
+          recommendationCost +
+            continuingConsumablesCost +
+            feeReserve
+        );
+
+      return {
+        routeId:
+          route.id,
+        professionNeutral:
+          true,
+        pathCount:
+          pathPlans.length,
+        recommendationCost:
+          currencyRound(
+            run,
+            recommendationCost
+          ),
+        continuingConsumablesCost:
+          currencyRound(
+            run,
+            continuingConsumablesCost
+          ),
+        feeReserve:
+          currencyRound(
+            run,
+            feeReserve
+          ),
+        minimumJourneyBudget,
+        projectedFoodKg:
+          util.roundTo(
+            totalFoodTarget,
+            2
+          ),
+        projectedWaterConsumptionLiters:
+          util.roundTo(
+            totalWaterTarget,
+            2
+          ),
+        projectedFodderKg:
+          util.roundTo(
+            totalFodderTarget,
+            2
+          ),
+        recommendations,
+        routeBaseKit:
+          util.deepClone(
+            baseKit
+          ),
+        paths: pathPlans
+      };
+    }
+
+    function authoredStartingFundsProfile(
+      run
+    ) {
+      const route =
+        selectors.route(run);
+
+      const profession =
+        selectors.profession(
+          run
+        );
+
+      const mode =
+        selectors.mode(run);
+
+      let minimumFundsMultiplier =
+        Infinity;
+
+      for (
+        const candidate of
+        content.list(
+          "professions"
+        )
+      ) {
+        const multiplier =
+          Number(
+            candidate
+              .fundsMultiplier
+          );
+
+        if (
+          Number.isFinite(
+            multiplier
+          ) &&
+          multiplier > 0
+        ) {
+          minimumFundsMultiplier =
+            Math.min(
+              minimumFundsMultiplier,
+              multiplier
+            );
+        }
+      }
+
+      if (
+        !Number.isFinite(
+          minimumFundsMultiplier
+        )
+      ) {
+        minimumFundsMultiplier =
+          1;
+      }
+
+      const routeModeBase =
+        route.economy
+          .baseFunds *
+        mode
+          .startingFundsFactor;
+
+      const poorestStartingFunds =
+        currencyRound(
+          run,
+          routeModeBase *
+            minimumFundsMultiplier
+        );
+
+      const authoredStartingFunds =
+        currencyRound(
+          run,
+          routeModeBase *
+            profession
+              .fundsMultiplier
+        );
+
+      const authoredCashAdvantage =
+        currencyRound(
+          run,
+          Math.max(
+            0,
+            authoredStartingFunds -
+              poorestStartingFunds
+          )
+        );
+
+      return {
+        routeModeBase:
+          currencyRound(
+            run,
+            routeModeBase
+          ),
+        minimumFundsMultiplier,
+        professionFundsMultiplier:
+          profession
+            .fundsMultiplier,
+        poorestStartingFunds,
+        authoredStartingFunds,
+        authoredCashAdvantage
+      };
+    }
+
+    function applyJourneyBudgetFloor(
+      run,
+      visit
+    ) {
+      ensureEconomyState(
+        run
+      );
+
+      if (
+        !visit ||
+        !visit.isDeparture
+      ) {
+        return {
+          applied: false,
+          reason:
+            "not-departure"
+        };
+      }
+
+      if (!run.flags) {
+        run.flags = {};
+      }
+
+      /*
+       * Remove the old player-facing implementation explanation from any
+       * active outfitting save reconciled from V10. Archived records and
+       * departed expeditions are deliberately left untouched.
+       */
+      if (
+        run.status ===
+          "outfitting" &&
+        run.journal &&
+        Array.isArray(
+          run.journal.entries
+        )
+      ) {
+        run.journal.entries =
+          run.journal.entries.filter(
+            (entry) =>
+              entry.type !==
+              "journey-support"
+          );
+      }
+
+      if (
+        run.flags
+          .startingFundsBalanceVersion ===
+        STARTING_FUNDS_BALANCE_VERSION
+      ) {
+        return {
+          applied: false,
+          reason:
+            "already-applied",
+          support:
+            Number(
+              run.economy
+                .journeySupport
+            ) || 0,
+          adjustment: 0,
+          minimumJourneyBudget:
+            Number(
+              run.economy
+                .minimumJourneyBudget
+            ) || 0,
+          professionCashAdvantage:
+            Number(
+              run.economy
+                .professionCashAdvantage
+            ) || 0,
+          finalStartingFunds:
+            Number(
+              run.economy
+                .startingFunds
+            ) || 0,
+          balanceVersion:
+            STARTING_FUNDS_BALANCE_VERSION
+        };
+      }
+
+      const budget =
+        fullJourneyBudgetPlan(
+          run,
+          visit
+        );
+
+      const profile =
+        authoredStartingFundsProfile(
+          run
+        );
+
+      const targetStartingFunds =
+        currencyRound(
+          run,
+          Math.max(
+            profile
+              .authoredStartingFunds,
+            budget
+              .minimumJourneyBudget +
+              profile
+                .authoredCashAdvantage
+          )
+        );
+
+      const currentStartingFunds =
+        Number.isFinite(
+          Number(
+            run.economy
+              .startingFunds
+          )
+        )
+          ? Number(
+              run.economy
+                .startingFunds
+            )
+          : profile
+              .authoredStartingFunds;
+
+      /*
+       * Save reconciliation is upward only. A previously loaded V10 run never
+       * loses money, and purchases already made are not reset.
+       */
+      const finalStartingFunds =
+        currencyRound(
+          run,
+          Math.max(
+            currentStartingFunds,
+            targetStartingFunds
+          )
+        );
+
+      const adjustment =
+        currencyRound(
+          run,
+          Math.max(
+            0,
+            finalStartingFunds -
+              currentStartingFunds
+          )
+        );
+
+      const totalAdjustment =
+        currencyRound(
+          run,
+          Math.max(
+            0,
+            finalStartingFunds -
+              profile
+                .authoredStartingFunds
+          )
+        );
+
+      run.economy
+        .baseStartingFunds =
+        profile
+          .authoredStartingFunds;
+
+      run.economy
+        .poorestProfessionStartingFunds =
+        profile
+          .poorestStartingFunds;
+
+      run.economy
+        .professionCashAdvantage =
+        profile
+          .authoredCashAdvantage;
+
+      run.economy
+        .minimumJourneyBudget =
+        budget
+          .minimumJourneyBudget;
+
+      run.economy
+        .journeySupport =
+        totalAdjustment;
+
+      run.economy
+        .adjustedStartingFunds =
+        finalStartingFunds;
+
+      run.economy
+        .startingFundsBalanceVersion =
+        STARTING_FUNDS_BALANCE_VERSION;
+
+      run.economy
+        .journeyBudgetPlan = {
+          professionNeutral:
+            true,
+          pathCount:
+            budget.pathCount,
+          recommendationCost:
+            budget
+              .recommendationCost,
+          continuingConsumablesCost:
+            budget
+              .continuingConsumablesCost,
+          feeReserve:
+            budget.feeReserve,
+          projectedFoodKg:
+            budget
+              .projectedFoodKg,
+          projectedWaterConsumptionLiters:
+            budget
+              .projectedWaterConsumptionLiters,
+          projectedFodderKg:
+            budget
+              .projectedFodderKg
+        };
+
+      if (adjustment > 0) {
+        run.economy.funds =
+          currencyRound(
+            run,
+            run.economy.funds +
+              adjustment
+          );
+
+        run.economy
+          .startingFunds =
+          finalStartingFunds;
+
+        if (run.setup) {
+          run.setup.initialFunds =
+            currencyRound(
+              run,
+              Math.max(
+                Number(
+                  run.setup
+                    .initialFunds
+                ) || 0,
+                finalStartingFunds
+              )
+            );
+        }
+
+        if (
+          !Array.isArray(
+            visit.transactions
+          )
+        ) {
+          visit.transactions = [];
+        }
+
+        /*
+         * Keep a machine-readable accounting record without exposing the
+         * balancing implementation as a journal entry or store callout.
+         */
+        const transaction = {
+          id:
+            `transaction-${String(run.economy.transactions.length + 1).padStart(5, "0")}`,
+          visitId:
+            visit.id,
+          milestoneId:
+            visit.milestoneId,
+          day:
+            run.calendar.dayIndex,
+          date:
+            util.deepClone(
+              run.calendar
+                .currentDate
+            ),
+          type:
+            "starting-funds-adjustment",
+          amount:
+            adjustment,
+          total:
+            adjustment,
+          targetStartingFunds,
+          finalStartingFunds,
+          balanceVersion:
+            STARTING_FUNDS_BALANCE_VERSION
+        };
+
+        run.economy
+          .transactions.push(
+            transaction
+          );
+
+        visit.transactions.push(
+          transaction.id
+        );
+      } else {
+        run.economy
+          .startingFunds =
+          finalStartingFunds;
+
+        if (run.setup) {
+          run.setup.initialFunds =
+            currencyRound(
+              run,
+              Math.max(
+                Number(
+                  run.setup
+                    .initialFunds
+                ) || 0,
+                finalStartingFunds
+              )
+            );
+        }
+      }
+
+      run.flags
+        .journeyBudgetSupportApplied =
+        true;
+
+      run.flags
+        .startingFundsBalanceVersion =
+        STARTING_FUNDS_BALANCE_VERSION;
+
+      return {
+        applied:
+          adjustment > 0,
+        support:
+          totalAdjustment,
+        adjustment,
+        minimumJourneyBudget:
+          budget
+            .minimumJourneyBudget,
+        professionCashAdvantage:
+          profile
+            .authoredCashAdvantage,
+        baseStartingFunds:
+          profile
+            .authoredStartingFunds,
+        poorestStartingFunds:
+          profile
+            .poorestStartingFunds,
+        targetStartingFunds,
+        finalStartingFunds,
+        balanceVersion:
+          STARTING_FUNDS_BALANCE_VERSION,
+        plan:
+          budget
+      };
+    }
+
+    /*
+     * TRAIL_ATLAS_STARTING_FUNDS_UI_PARITY_PATCH_V12
+     *
+     * Starting funds must have one source of truth. These helpers deliberately
+     * reuse the existing deterministic departure-market generation and the
+     * existing V11 journey-budget floor. No UI-only balance formula is kept.
+     */
+
+    function startingFundsSnapshot(
+      run
+    ) {
+      const startingFunds =
+        Number.isFinite(
+          Number(
+            run.economy
+              .startingFunds
+          )
+        )
+          ? Number(
+              run.economy
+                .startingFunds
+            )
+          : 0;
+
+      const baseStartingFunds =
+        Number.isFinite(
+          Number(
+            run.economy
+              .baseStartingFunds
+          )
+        )
+          ? Number(
+              run.economy
+                .baseStartingFunds
+            )
+          : startingFunds;
+
+      return {
+        startingFunds,
+        currentFunds:
+          Number.isFinite(
+            Number(
+              run.economy
+                .funds
+            )
+          )
+            ? Number(
+                run.economy
+                  .funds
+              )
+            : startingFunds,
+        baseStartingFunds,
+        poorestStartingFunds:
+          Number.isFinite(
+            Number(
+              run.economy
+                .poorestProfessionStartingFunds
+            )
+          )
+            ? Number(
+                run.economy
+                  .poorestProfessionStartingFunds
+              )
+            : 0,
+        professionCashAdvantage:
+          Number.isFinite(
+            Number(
+              run.economy
+                .professionCashAdvantage
+            )
+          )
+            ? Number(
+                run.economy
+                  .professionCashAdvantage
+              )
+            : 0,
+        journeySupport:
+          Number.isFinite(
+            Number(
+              run.economy
+                .journeySupport
+            )
+          )
+            ? Number(
+                run.economy
+                  .journeySupport
+              )
+            : 0,
+        minimumJourneyBudget:
+          Number.isFinite(
+            Number(
+              run.economy
+                .minimumJourneyBudget
+            )
+          )
+            ? Number(
+                run.economy
+                  .minimumJourneyBudget
+              )
+            : startingFunds,
+        balanceVersion:
+          run.flags &&
+          run.flags
+            .startingFundsBalanceVersion
+            ? run.flags
+                .startingFundsBalanceVersion
+            : null,
+        journeyBudgetPlan:
+          run.economy
+            .journeyBudgetPlan
+            ? util.deepClone(
+                run.economy
+                  .journeyBudgetPlan
+              )
+            : null
+      };
+    }
+
+    function quoteStartingFundsForRun(
+      sourceRun
+    ) {
+      requireRun(
+        sourceRun
+      );
+
+      const preview =
+        util.deepClone(
+          sourceRun
+        );
+
+      ensureMarketState(
+        preview
+      );
+
+      ensureEconomyState(
+        preview
+      );
+
+      if (!preview.flags) {
+        preview.flags = {};
+      }
+
+      if (
+        preview.status !==
+          "outfitting" ||
+        preview.flags.departed
+      ) {
+        return startingFundsSnapshot(
+          preview
+        );
+      }
+
+      if (
+        preview.flags
+          .startingFundsBalanceVersion ===
+        STARTING_FUNDS_BALANCE_VERSION
+      ) {
+        return startingFundsSnapshot(
+          preview
+        );
+      }
+
+      if (!preview.setup) {
+        throw new ValidationError(
+          "Outfitting run is missing setup state.",
+          {
+            code:
+              "STARTING_FUNDS_SETUP_MISSING"
+          }
+        );
+      }
+
+      /*
+       * Quote mode must be allowed to inspect the departure market without
+       * changing the real run or requiring the player to acknowledge the
+       * briefing first.
+       */
+      preview.setup
+        .briefingAcknowledged =
+        true;
+
+      const route =
+        selectors.route(
+          preview
+        );
+
+      let visit =
+        activeMarketVisit(
+          preview
+        );
+
+      if (
+        !visit ||
+        visit.milestoneId !==
+          route.startMilestoneId
+      ) {
+        visit =
+          Object.values(
+            preview.markets
+              .visits
+          )
+            .filter(
+              (candidate) =>
+                candidate &&
+                candidate.milestoneId ===
+                  route.startMilestoneId &&
+                candidate.isDeparture
+            )
+            .sort(
+              (first, second) =>
+                first.visitNumber -
+                second.visitNumber
+            )[0] || null;
+      }
+
+      if (visit) {
+        applyJourneyBudgetFloor(
+          preview,
+          visit
+        );
+      } else {
+        openMarket(
+          preview,
+          route.startMilestoneId,
+          {
+            allowRemote: true,
+            allowWithoutBriefing:
+              true,
+            forceNew: false
+          }
+        );
+      }
+
+      return startingFundsSnapshot(
+        preview
+      );
+    }
+
+    function startingFundsQuote(
+      world,
+      setup,
+      options = {}
+    ) {
+      if (
+        !util.isPlainObject(
+          world
+        ) ||
+        !util.isPlainObject(
+          setup
+        )
+      ) {
+        throw new ValidationError(
+          "Starting-funds quote requires a world and setup object.",
+          {
+            code:
+              "STARTING_FUNDS_QUOTE_INVALID"
+          }
+        );
+      }
+
+      const route =
+        content.require(
+          "routes",
+          setup.routeId
+        );
+
+      const profession =
+        content.require(
+          "professions",
+          setup.professionId
+        );
+
+      const mode =
+        content.require(
+          "modes",
+          setup.modeId ||
+            "standard"
+        );
+
+      const previewSeed =
+        typeof setup.seed ===
+          "string" &&
+        setup.seed.trim()
+          ? setup.seed.trim()
+          : [
+              world.worldSeed,
+              "starting-funds",
+              route.id,
+              profession.id,
+              mode.id
+            ].join("|");
+
+      const previewRun =
+        runModel.factory.create(
+          {
+            routeId:
+              route.id,
+            professionId:
+              profession.id,
+            modeId:
+              mode.id,
+            seed:
+              previewSeed
+          },
+          world,
+          {
+            runId:
+              options.runId ||
+              "run-starting-funds-preview",
+            timestamp:
+              options.timestamp ||
+              "2000-01-01T00:00:00.000Z"
+          }
+        );
+
+      return quoteStartingFundsForRun(
+        previewRun
+      );
+    }
+
+    function applyStartingFundsQuote(
+      run,
+      quote,
+      options = {}
+    ) {
+      requireOutfittingRun(
+        run
+      );
+
+      ensureMarketState(
+        run
+      );
+
+      ensureEconomyState(
+        run
+      );
+
+      if (
+        !quote ||
+        !Number.isFinite(
+          Number(
+            quote.startingFunds
+          )
+        )
+      ) {
+        throw new ValidationError(
+          "Starting-funds quote is invalid.",
+          {
+            code:
+              "STARTING_FUNDS_QUOTE_INVALID"
+          }
+        );
+      }
+
+      if (!run.flags) {
+        run.flags = {};
+      }
+
+      const currentStartingFunds =
+        Number.isFinite(
+          Number(
+            run.economy
+              .startingFunds
+          )
+        )
+          ? Number(
+              run.economy
+                .startingFunds
+            )
+          : 0;
+
+      /*
+       * Save reconciliation remains upward only. A player never loses money
+       * because an old outfitting save is opened by a newer patch.
+       */
+      const finalStartingFunds =
+        currencyRound(
+          run,
+          Math.max(
+            currentStartingFunds,
+            Number(
+              quote.startingFunds
+            )
+          )
+        );
+
+      const adjustment =
+        currencyRound(
+          run,
+          Math.max(
+            0,
+            finalStartingFunds -
+              currentStartingFunds
+          )
+        );
+
+      if (adjustment > 0) {
+        run.economy.funds =
+          currencyRound(
+            run,
+            run.economy.funds +
+              adjustment
+          );
+      }
+
+      const baseStartingFunds =
+        Number.isFinite(
+          Number(
+            quote
+              .baseStartingFunds
+          )
+        )
+          ? Number(
+              quote
+                .baseStartingFunds
+            )
+          : currentStartingFunds;
+
+      run.economy
+        .baseStartingFunds =
+        baseStartingFunds;
+
+      run.economy
+        .poorestProfessionStartingFunds =
+        Number.isFinite(
+          Number(
+            quote
+              .poorestStartingFunds
+          )
+        )
+          ? Number(
+              quote
+                .poorestStartingFunds
+            )
+          : 0;
+
+      run.economy
+        .professionCashAdvantage =
+        Number.isFinite(
+          Number(
+            quote
+              .professionCashAdvantage
+          )
+        )
+          ? Number(
+              quote
+                .professionCashAdvantage
+            )
+          : 0;
+
+      run.economy
+        .minimumJourneyBudget =
+        Number.isFinite(
+          Number(
+            quote
+              .minimumJourneyBudget
+          )
+        )
+          ? Number(
+              quote
+                .minimumJourneyBudget
+            )
+          : finalStartingFunds;
+
+      run.economy
+        .journeySupport =
+        currencyRound(
+          run,
+          Math.max(
+            Number(
+              run.economy
+                .journeySupport
+            ) || 0,
+            Number(
+              quote
+                .journeySupport
+            ) || 0,
+            finalStartingFunds -
+              baseStartingFunds
+          )
+        );
+
+      run.economy
+        .adjustedStartingFunds =
+        finalStartingFunds;
+
+      run.economy
+        .startingFunds =
+        finalStartingFunds;
+
+      run.economy
+        .startingFundsBalanceVersion =
+        STARTING_FUNDS_BALANCE_VERSION;
+
+      run.economy
+        .journeyBudgetPlan =
+        quote.journeyBudgetPlan
+          ? util.deepClone(
+              quote
+                .journeyBudgetPlan
+            )
+          : run.economy
+              .journeyBudgetPlan ||
+            null;
+
+      if (run.setup) {
+        run.setup.initialFunds =
+          finalStartingFunds;
+      }
+
+      run.flags
+        .journeyBudgetSupportApplied =
+        true;
+
+      run.flags
+        .startingFundsBalanceVersion =
+        STARTING_FUNDS_BALANCE_VERSION;
+
+      if (
+        adjustment > 0 &&
+        options.recordTransaction !==
+          false
+      ) {
+        const alreadyRecorded =
+          run.economy
+            .transactions
+            .some(
+              (transaction) =>
+                transaction.type ===
+                  "starting-funds-adjustment" &&
+                transaction
+                  .balanceVersion ===
+                  STARTING_FUNDS_BALANCE_VERSION
+            );
+
+        if (!alreadyRecorded) {
+          const visit =
+            activeMarketVisit(
+              run
+            );
+
+          const transaction = {
+            id:
+              `transaction-${String(run.economy.transactions.length + 1).padStart(5, "0")}`,
+            visitId:
+              visit
+                ? visit.id
+                : null,
+            milestoneId:
+              selectors.route(
+                run
+              ).startMilestoneId,
+            day:
+              run.calendar.dayIndex,
+            date:
+              util.deepClone(
+                run.calendar
+                  .currentDate
+              ),
+            type:
+              "starting-funds-adjustment",
+            amount:
+              adjustment,
+            total:
+              adjustment,
+            targetStartingFunds:
+              finalStartingFunds,
+            finalStartingFunds,
+            balanceVersion:
+              STARTING_FUNDS_BALANCE_VERSION
+          };
+
+          run.economy
+            .transactions
+            .push(
+              transaction
+            );
+
+          if (
+            visit &&
+            Array.isArray(
+              visit.transactions
+            )
+          ) {
+            visit.transactions.push(
+              transaction.id
+            );
+          }
+        }
+      }
+
+      touchRun(
+        run
+      );
+
+      return {
+        applied:
+          adjustment > 0,
+        adjustment,
+        finalStartingFunds,
+        startingFunds:
+          finalStartingFunds,
+        baseStartingFunds,
+        journeySupport:
+          run.economy
+            .journeySupport,
+        minimumJourneyBudget:
+          run.economy
+            .minimumJourneyBudget,
+        balanceVersion:
+          STARTING_FUNDS_BALANCE_VERSION
+      };
+    }
+
     function buildDepartureBriefing(
       run
     ) {
@@ -35396,6 +38187,11 @@
 
       const mode =
         selectors.mode(run);
+
+      const startingFunds =
+        quoteStartingFundsForRun(
+          run
+        );
 
       const nextMarket =
         findNextMarketPath(run);
@@ -35505,7 +38301,8 @@
         currentSupplies:
           supplies,
         funds:
-          run.economy.funds,
+          startingFunds
+            .startingFunds,
         currency:
           util.deepClone(
             route.economy
@@ -35521,6 +38318,11 @@
     function startingResourceSummary(
       run
     ) {
+      const funds =
+        quoteStartingFundsForRun(
+          run
+        );
+
       const bySource = {};
 
       for (const lot of run.inventory.lots) {
@@ -35541,10 +38343,20 @@
 
       return {
         startingFunds:
-          run.economy
+          funds
             .startingFunds,
         currentFunds:
-          run.economy.funds,
+          funds
+            .currentFunds,
+        baseStartingFunds:
+          funds
+            .baseStartingFunds,
+        journeySupport:
+          funds
+            .journeySupport,
+        minimumJourneyBudget:
+          funds
+            .minimumJourneyBudget,
         bySource,
         professionId:
           run.professionId,
@@ -35877,8 +38689,12 @@
           )
         ) {
           if (
-            recommendation.priority ===
-            "essential"
+            [
+              "essential",
+              "recommended"
+            ].includes(
+              recommendation.priority
+            )
           ) {
             stockFloors[
               recommendation.itemId
@@ -35978,15 +38794,31 @@
             item
           );
 
-        const essentialFloor =
-          roundStockToStep(
+        const requestedFloor =
+          Math.max(
+            0,
             Number(
               stockFloors[
                 item.id
               ]
-            ) || 0,
-            item
+            ) || 0
           );
+
+        const essentialFloor =
+          requestedFloor > 0
+            ? util.roundTo(
+                Math.ceil(
+                  requestedFloor /
+                  quantityStep(
+                    item
+                  )
+                ) *
+                quantityStep(
+                  item
+                ),
+                3
+              )
+            : 0;
 
         generatedStock =
           Math.max(
@@ -36279,6 +39111,21 @@
       run.economy
         .currentMarketName =
         visit.name;
+
+      const journeyBudget =
+        visit.isDeparture
+          ? applyJourneyBudgetFloor(
+              run,
+              visit
+            )
+          : null;
+
+      if (journeyBudget) {
+        visit.journeyBudget =
+          util.deepClone(
+            journeyBudget
+          );
+      }
 
       if (
         run.status ===
@@ -37267,6 +40114,33 @@
         creditUsed:
           run.economy
             .creditUsed,
+        baseStartingFunds:
+          Number(
+            run.economy
+              .baseStartingFunds
+          ) ||
+          run.economy
+            .startingFunds,
+        journeySupport:
+          Number(
+            run.economy
+              .journeySupport
+          ) || 0,
+        minimumJourneyBudget:
+          Number(
+            run.economy
+              .minimumJourneyBudget
+          ) ||
+          run.economy
+            .startingFunds,
+        journeyBudgetPlan:
+          run.economy
+            .journeyBudgetPlan
+            ? util.deepClone(
+                run.economy
+                  .journeyBudgetPlan
+              )
+            : null,
         currency:
           util.deepClone(
             selectors.route(run)
@@ -37993,6 +40867,12 @@
        ====================================================================== */
 
     const economy = Object.freeze({
+      STARTING_FUNDS_BALANCE_VERSION,
+      authoredStartingFundsProfile,
+      startingFundsQuote,
+      startingFundsQuoteForRun:
+        quoteStartingFundsForRun,
+      applyStartingFundsQuote,
       touchRun,
       briefing:
         buildDepartureBriefing,
@@ -38000,6 +40880,11 @@
         startingResourceSummary,
       recommendations:
         createRecommendations,
+      fullJourneyBudgetPlan,
+      applyJourneyBudgetFloor,
+      destinationPaths:
+        destinationPathsFrom,
+      waterContainerCapacityLiters,
       findNextMarket:
         findNextMarketPath,
       segmentReservePlan,
@@ -40268,6 +43153,12 @@
         baseSpeed:
           transportType
             .baseSpeedKmPerDay,
+        routeCompression:
+          selectors
+            .routeCalibration(
+              run.routeId
+            )
+            .scale,
         terrain:
           terrain.movementFactor,
         transportTerrain:
@@ -40714,13 +43605,9 @@
         selectors.route(run);
 
       const fraction =
-        util.clamp(
-          run.progress
-            .distanceTraveledKm /
-            route.distanceKm,
-          0,
-          1
-        );
+        selectors
+          .itinerary(run)
+          .fraction;
 
       const unlocked = [];
 
@@ -43489,9 +46376,14 @@
     function activityFatigueDelta(
       activity
     ) {
+      const balance =
+        runModel
+          .JOURNEY_BALANCE;
+
       switch (activity) {
         case "travel":
-          return 8.5;
+          return balance
+            .travelFatiguePerDay;
         case "provision":
           return 7;
         case "repair":
@@ -43499,15 +46391,19 @@
         case "treat":
           return -5;
         case "lodging":
-          return -24;
+          return -balance
+            .lodgingRecoveryPerDay;
         case "rest":
-          return -20;
+          return -balance
+            .restRecoveryPerDay;
         case "wait":
-          return -8;
+          return -balance
+            .waitRecoveryPerDay;
         default:
           return -4;
       }
     }
+
 
     function automaticConditionCleanup(
       member,
@@ -48780,12 +51676,30 @@
     } = runModel;
 
     const EVENT_TRIGGER_RATES = Object.freeze({
-      departure: 0.12,
-      "travel-day": 0.24,
-      "camp-day": 0.17,
-      milestone: 0.58,
-      "after-action": 0.12,
-      "town-entry": 0.35,
+      departure:
+        runModel
+          .JOURNEY_BALANCE
+          .departureEventRate,
+      "travel-day":
+        runModel
+          .JOURNEY_BALANCE
+          .travelEventRate,
+      "camp-day":
+        runModel
+          .JOURNEY_BALANCE
+          .campEventRate,
+      milestone:
+        runModel
+          .JOURNEY_BALANCE
+          .milestoneEventRate,
+      "after-action":
+        runModel
+          .JOURNEY_BALANCE
+          .afterActionEventRate,
+      "town-entry":
+        runModel
+          .JOURNEY_BALANCE
+          .townEventRate,
       diagnostic: 1
     });
 
@@ -50739,7 +53653,9 @@
               0,
               requestedMinimumGap
             )
-          : 1;
+          : runModel
+              .JOURNEY_BALANCE
+              .minimumRandomEventGapDays;
 
       if (
         !forced.length &&
@@ -65848,17 +68764,11 @@
     function routeCompletionFraction(
       run
     ) {
-      const route =
-        selectors.route(run);
-
-      return util.clamp(
-        run.progress
-          .distanceTraveledKm /
-          route.distanceKm,
-        0,
-        1
-      );
+      return selectors
+        .itinerary(run)
+        .fraction;
     }
+
 
     function outcomeType(run) {
       if (
@@ -65989,14 +68899,27 @@
         return true;
       }
 
+      const itinerary =
+        selectors.itinerary(
+          run
+        );
+
+      const adjustedLate =
+        travel.Calendar.addDays(
+          late,
+          itinerary
+            .extraTargetDays
+        );
+
       return (
         travel.Calendar.compare(
           run.calendar
             .currentDate,
-          late
+          adjustedLate
         ) <= 0
       );
     }
+
 
     function objectiveResult(
       run,
@@ -66377,12 +69300,9 @@
       );
 
       const targetDays =
-        route.scoreProfile &&
-        route.scoreProfile
-          .targetDays
-          ? route.scoreProfile
-              .targetDays
-          : route.estimatedDays[0];
+        selectors
+          .itinerary(run)
+          .targetDays;
 
       const timingPoints =
         run.status ===
@@ -67184,6 +70104,19 @@
         distanceTraveledKm:
           run.progress
             .distanceTraveledKm,
+        effectiveRouteDistanceKm:
+          selectors
+            .itinerary(run)
+            .distanceKm,
+        targetDays:
+          selectors
+            .itinerary(run)
+            .targetDays,
+        estimatedDays:
+          selectors
+            .itinerary(run)
+            .estimatedDays
+            .slice(),
         completionFraction:
           routeCompletionFraction(
             run
@@ -70413,6 +73346,12 @@
           route.destinationMilestoneId
         );
 
+      const itineraryRange =
+        runModel.selectors
+          .itineraryRange(
+            route.id
+          );
+
       const ledger =
         world.routeLedgers[
           route.id
@@ -70446,11 +73385,23 @@
         destinationName:
           destination.name,
         distanceKm:
-          route.distanceKm,
+          itineraryRange
+            .distanceRangeKm[0],
+        distanceRangeKm:
+          itineraryRange
+            .distanceRangeKm
+            .slice(),
         estimatedDays:
-          util.deepClone(
-            route.estimatedDays
-          ),
+          itineraryRange
+            .estimatedDays
+            .slice(),
+        targetDaysRange:
+          itineraryRange
+            .targetDaysRange
+            .slice(),
+        pathCount:
+          itineraryRange
+            .pathCount,
         difficulty:
           route.difficulty,
         riskRating:
@@ -70502,10 +73453,81 @@
       };
     }
 
+    function projectedWorldForStartingFunds(
+      sourceWorld,
+      options = {}
+    ) {
+      const active =
+        sourceWorld &&
+        sourceWorld.activeRun;
+
+      if (!active) {
+        return sourceWorld;
+      }
+
+      const finished =
+        [
+          "completed",
+          "failed",
+          "abandoned"
+        ].includes(
+          active.status
+        );
+
+      const needsFinishedCommit =
+        finished &&
+        !(
+          active.flags &&
+          active.flags
+            .outcomeCommitted
+        );
+
+      const needsReplacementCommit =
+        !finished &&
+        options.replaceActive ===
+          true;
+
+      if (
+        !needsFinishedCommit &&
+        !needsReplacementCommit
+      ) {
+        return sourceWorld;
+      }
+
+      const projected =
+        util.deepClone(
+          sourceWorld
+        );
+
+      const projectedRun =
+        projected.activeRun;
+
+      if (
+        needsReplacementCommit
+      ) {
+        outcomes.abandon(
+          projectedRun,
+          "replaced-by-new-expedition"
+        );
+      }
+
+      outcomes.commit(
+        projected,
+        projectedRun
+      );
+
+      projected.activeRun =
+        null;
+
+      return projected;
+    }
+
     function professionCard(
+      world,
       route,
       profession,
-      mode
+      mode,
+      seed
     ) {
       const presentation =
         content.presentation(
@@ -70514,17 +73536,23 @@
           route.id
         );
 
-      const funds =
-        util.roundTo(
-          route.economy
-            .baseFunds *
-            profession
-              .fundsMultiplier *
-            mode
-              .startingFundsFactor,
-          route.economy
-            .currency.decimals
+      const fundsQuote =
+        economy.startingFundsQuote(
+          world,
+          {
+            routeId:
+              route.id,
+            professionId:
+              profession.id,
+            modeId:
+              mode.id,
+            seed
+          }
         );
+
+      const funds =
+        fundsQuote
+          .startingFunds;
 
       const routeItems =
         (
@@ -71235,6 +74263,12 @@
             modeId
           );
 
+        const fundsWorld =
+          projectedWorldForStartingFunds(
+            world,
+            options
+          );
+
         return {
           screen: "setup",
           route:
@@ -71256,9 +74290,11 @@
               .map(
                 (profession) =>
                   professionCard(
+                    fundsWorld,
                     route,
                     profession,
-                    mode
+                    mode,
+                    options.seed
                   )
               ),
           modes:
@@ -71379,6 +74415,10 @@
           runModel.selectors
             .route(run);
 
+        const itinerary =
+          runModel.selectors
+            .itinerary(run);
+
         const milestone =
           runModel.selectors
             .currentMilestone(
@@ -71431,7 +74471,18 @@
             subtitle:
               route.subtitle,
             distanceKm:
+              itinerary.distanceKm,
+            authoredDistanceKm:
               route.distanceKm,
+            estimatedDays:
+              itinerary
+                .estimatedDays
+                .slice(),
+            targetDays:
+              itinerary.targetDays,
+            branchExtraDays:
+              itinerary
+                .branchExtraDays,
             visual:
               util.deepClone(
                 route.visual
@@ -71487,15 +74538,20 @@
               run.progress
                 .distanceTraveledKm,
             routeDistanceKm:
+              itinerary.distanceKm,
+            authoredRouteDistanceKm:
               route.distanceKm,
             fraction:
-              util.clamp(
-                run.progress
-                  .distanceTraveledKm /
-                  route.distanceKm,
-                0,
-                1
-              )
+              itinerary.fraction,
+            targetDays:
+              itinerary.targetDays,
+            estimatedDays:
+              itinerary
+                .estimatedDays
+                .slice(),
+            branchExtraDays:
+              itinerary
+                .branchExtraDays
           },
           weather: {
             id:
@@ -73114,20 +76170,77 @@
               requireWorld(game);
           }
 
-          return TA.runFactory
-            .install(
-              game.store,
-              setup,
+          const installed =
+            await TA.runFactory
+              .install(
+                game.store,
+                setup,
+                {
+                  runId:
+                    util.createId(
+                      "run"
+                    ),
+                  timestamp:
+                    nowIso(),
+                  allowReplace: false
+                }
+              );
+
+          const fundsTransaction =
+            game.store.transaction(
+              "resolve-starting-funds",
+              (draft) => {
+                const run =
+                  draft.activeRun;
+
+                if (!run) {
+                  throw new SimulationError(
+                    "The newly created expedition is unavailable.",
+                    {
+                      code:
+                        "NEW_RUN_MISSING"
+                    }
+                  );
+                }
+
+                const quote =
+                  economy
+                    .startingFundsQuoteForRun(
+                      run
+                    );
+
+                return economy
+                  .applyStartingFundsQuote(
+                    run,
+                    quote
+                  );
+              },
               {
-                runId:
-                  util.createId(
-                    "run"
-                  ),
-                timestamp:
-                  nowIso(),
-                allowReplace: false
+                save: true,
+                immediate: true
               }
             );
+
+          if (
+            fundsTransaction
+              .savePromise
+          ) {
+            await fundsTransaction
+              .savePromise;
+          }
+
+          return {
+            ...installed,
+            startingFunds:
+              fundsTransaction
+                .result,
+            run:
+              util.deepClone(
+                game.store
+                  .peek()
+                  .activeRun
+              )
+          };
         }
       );
 
@@ -74159,7 +77272,8 @@
       hash,
       errors,
       content,
-      diagnostics
+      diagnostics,
+      runModel
     } = TA;
 
     const {
@@ -74760,7 +77874,7 @@
       if (scene.mode === "title") {
         return (
           "A restrained illustrated landscape for Trail Atlas: " +
-          "Journeys Through Time."
+          "Journeys Through Time. By: Matthew Taraschke."
         );
       }
 
@@ -74865,7 +77979,7 @@
         caption:
           "A historical journey engine spanning eight routes and many centuries.",
         description:
-          "A restrained illustrated landscape for Trail Atlas: Journeys Through Time."
+          "A restrained illustrated landscape for Trail Atlas: Journeys Through Time. By: Matthew Taraschke."
       };
     }
 
@@ -74984,6 +78098,10 @@
         content.getRouteIndex(
           route.id
         );
+
+      const itinerary =
+        runModel.selectors
+          .itinerary(run);
 
       const milestone =
         routeIndex.getMilestone(
@@ -75233,13 +78351,7 @@
         ].join("|"),
         progress: {
           route:
-            util.clamp(
-              run.progress
-                .distanceTraveledKm /
-                route.distanceKm,
-              0,
-              1
-            ),
+            itinerary.fraction,
           segment:
             segment &&
             segment.distanceKm
@@ -79092,8 +82204,8 @@
 
       const panelHeight =
         Math.min(
-          height * 0.44,
-          170
+          height * 0.5,
+          190
         );
 
       const x =
@@ -79101,7 +82213,7 @@
         panelWidth * 0.5;
 
       const y =
-        height * 0.16;
+        height * 0.12;
 
       const gradient =
         context.createLinearGradient(
@@ -79152,7 +82264,7 @@
         context,
         "TRAIL ATLAS",
         width * 0.5,
-        y + panelHeight * 0.42,
+        y + panelHeight * 0.36,
         panelWidth * 0.84,
         Math.min(
           44,
@@ -79181,7 +82293,26 @@
       context.fillText(
         "JOURNEYS THROUGH TIME",
         width * 0.5,
-        y + panelHeight * 0.69
+        y + panelHeight * 0.61
+      );
+
+      context.fillStyle =
+        "#e9dfc8";
+
+      context.font =
+        `600 ${Math.max(9, Math.min(14, width * 0.021))}px ` +
+        `-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif`;
+
+      context.textAlign =
+        "center";
+
+      context.textBaseline =
+        "middle";
+
+      context.fillText(
+        "By: Matthew Taraschke",
+        width * 0.5,
+        y + panelHeight * 0.77
       );
 
       context.strokeStyle =
@@ -79196,14 +82327,14 @@
           panelWidth * 0.23,
         y +
           panelHeight *
-            0.82
+            0.91
       );
       context.lineTo(
         width * 0.5 +
           panelWidth * 0.23,
         y +
           panelHeight *
-            0.82
+            0.91
       );
       context.stroke();
     }
@@ -81332,6 +84463,39 @@
       );
     }
 
+
+    function formatRouteDistanceRange(
+      route,
+      world
+    ) {
+      const range =
+        Array.isArray(
+          route.distanceRangeKm
+        )
+          ? route.distanceRangeKm
+          : [
+              route.distanceKm,
+              route.distanceKm
+            ];
+
+      if (
+        Math.abs(
+          range[1] -
+          range[0]
+        ) < 0.001
+      ) {
+        return formatRouteDistance(
+          range[0],
+          world
+        );
+      }
+
+      return (
+        `${formatRouteDistance(range[0], world)}–` +
+        `${formatRouteDistance(range[1], world)}`
+      );
+    }
+
     function routeSelectionCard(
       route,
       world,
@@ -81437,8 +84601,8 @@
                           class:
                             "route-card__fact-value",
                           text:
-                            formatRouteDistance(
-                              route.distanceKm,
+                            formatRouteDistanceRange(
+                              route,
                               world
                             )
                         }
@@ -84009,7 +87173,14 @@
             routeId:
               draft.routeId,
             modeId:
-              draft.modeId
+              draft.modeId,
+            seed:
+              draft.seed,
+            replaceActive:
+              Boolean(
+                draft
+                  .replacementConfirmed
+              )
           }
         );
 
@@ -84397,6 +87568,12 @@
           draft.routeId
         );
 
+      const itineraryRange =
+        runModel.selectors
+          .itineraryRange(
+            route.id
+          );
+
       const profession =
         content.require(
           "professions",
@@ -84416,17 +87593,46 @@
           route.id
         );
 
-      const initialFunds =
-        util.roundTo(
-          route.economy
-            .baseFunds *
-            profession
-              .fundsMultiplier *
-            mode
-              .startingFundsFactor,
-          route.economy
-            .currency.decimals
+      const setupFundsModel =
+        ui.game.view(
+          "setup",
+          {
+            routeId:
+              draft.routeId,
+            modeId:
+              draft.modeId,
+            seed:
+              draft.seed,
+            replaceActive:
+              Boolean(
+                draft
+                  .replacementConfirmed
+              )
+          }
         );
+
+      const selectedFundsCard =
+        setupFundsModel
+          .professions
+          .find(
+            (entry) =>
+              entry.id ===
+              draft.professionId
+          );
+
+      if (!selectedFundsCard) {
+        throw new ValidationError(
+          "The selected profession funds quote is unavailable.",
+          {
+            code:
+              "STARTING_FUNDS_CARD_MISSING"
+          }
+        );
+      }
+
+      const initialFunds =
+        selectedFundsCard
+          .funds;
 
       const scoreMultiplier =
         profession
@@ -84434,6 +87640,27 @@
         mode.scoreMultiplier *
         route.scoreProfile
           .routeDifficultyMultiplier;
+
+      const startingFundsStat =
+        stat(
+          "Starting funds",
+          TA.format.money(
+            initialFunds,
+            route.economy
+              .currency
+          )
+        );
+
+      const startingFundsValue =
+        startingFundsStat
+          .querySelector(
+            ".stat__value"
+          );
+
+      if (startingFundsValue) {
+        startingFundsValue.id =
+          "party-starting-funds-value";
+      }
 
       const header =
         screenHeader(
@@ -84649,9 +87876,82 @@
                                     TA.LIMITS
                                       .customSeedCharacters
                                   ),
+                                required:
+                                  true,
                                 dataset: {
                                   draftField:
                                     "seed"
+                                },
+                                on: {
+                                  change:
+                                    (
+                                      changeEvent
+                                    ) => {
+                                      const nextSeed =
+                                        String(
+                                          changeEvent
+                                            .currentTarget
+                                            .value ||
+                                          ""
+                                        ).trim() ||
+                                        createSetupSeed(
+                                          route.id
+                                        );
+
+                                      changeEvent
+                                        .currentTarget
+                                        .value =
+                                        nextSeed;
+
+                                      ui.setupDraft.seed =
+                                        nextSeed;
+
+                                      const refreshed =
+                                        ui.game.view(
+                                          "setup",
+                                          {
+                                            routeId:
+                                              draft.routeId,
+                                            modeId:
+                                              draft.modeId,
+                                            seed:
+                                              nextSeed,
+                                            replaceActive:
+                                              Boolean(
+                                                draft
+                                                  .replacementConfirmed
+                                              )
+                                          }
+                                        );
+
+                                      const refreshedCard =
+                                        refreshed
+                                          .professions
+                                          .find(
+                                            (entry) =>
+                                              entry.id ===
+                                              draft
+                                                .professionId
+                                          );
+
+                                      const output =
+                                        document.getElementById(
+                                          "party-starting-funds-value"
+                                        );
+
+                                      if (
+                                        refreshedCard &&
+                                        output
+                                      ) {
+                                        output.textContent =
+                                          TA.format.money(
+                                            refreshedCard
+                                              .funds,
+                                            route.economy
+                                              .currency
+                                          );
+                                      }
+                                    }
                                 }
                               }
                             ),
@@ -84698,14 +87998,7 @@
                       "stat-grid"
                   },
                   [
-                    stat(
-                      "Starting funds",
-                      TA.format.money(
-                        initialFunds,
-                        route.economy
-                          .currency
-                      )
-                    ),
+                    startingFundsStat,
                     stat(
                       "Score factor",
                       TA.format.multiplier(
@@ -84721,7 +88014,7 @@
                     ),
                     stat(
                       "Estimated journey",
-                      `${route.estimatedDays[0]}–${route.estimatedDays[1]} days`
+                      `${itineraryRange.estimatedDays[0]}–${itineraryRange.estimatedDays[1]} days`
                     )
                   ]
                 ),
@@ -88392,6 +91685,20 @@
                   1
                   ? "success"
                   : ""
+              ),
+              dom.el(
+                "p",
+                {
+                  class:
+                    "text-small visually-muted",
+                  text:
+                    `Projected itinerary ${model.overallProgress.estimatedDays[0]}–${model.overallProgress.estimatedDays[1]} days; score target ${model.overallProgress.targetDays} days.` +
+                    (
+                      model.overallProgress.branchExtraDays > 0
+                        ? ` The selected branch receives ${model.overallProgress.branchExtraDays} additional calendar days.`
+                        : ""
+                    )
+                }
               ),
               model.segment
                 ? progressBar(
@@ -96825,7 +100132,8 @@
         const repairSmokeReport =
           await diagnostics.run({
             ids: [
-              "repair.core-smoke"
+              "repair.core-smoke",
+              "repair.starting-funds-parity"
             ],
             stopOnCriticalFailure:
               true
@@ -96865,6 +100173,90 @@
           await game.initialize({
             persistIfNew: true
           });
+
+
+        /*
+         * TRAIL_ATLAS_PROFESSION_FUNDS_BYLINE_PATCH_V11_SAVE_RECONCILIATION
+         *
+         * Existing archived records are never changed. An imported active run
+         * is marked current, and only an expedition still in outfitting may
+         * receive the corrected base water/container minimum. If its departure
+         * market was already open, the same finite journey-budget rule used by
+         * new runs is applied to that existing deterministic market.
+         */
+        if (
+          initialization.ok &&
+          game.store
+            .initialized
+        ) {
+          const loaded =
+            game.store.peek();
+
+          if (
+            loaded.activeRun &&
+            (
+              !loaded.activeRun
+                .flags ||
+              loaded.activeRun
+                .flags
+                .balanceVersion !==
+                TA.journeyBalance
+                  .patchVersion ||
+              loaded.activeRun
+                .flags
+                .startingFundsBalanceVersion !==
+                TA.economy
+                  .STARTING_FUNDS_BALANCE_VERSION
+            )
+          ) {
+            const reconciliation =
+              game.store.transaction(
+                "reconcile-playability-v11",
+                (draft) => {
+                  const run =
+                    draft.activeRun;
+
+                  const result =
+                    TA.runFactory
+                      .reconcileBalance(
+                        run
+                      );
+
+                  if (
+                    run.status ===
+                      "outfitting"
+                  ) {
+                    const fundsQuote =
+                      TA.economy
+                        .startingFundsQuoteForRun(
+                          run
+                        );
+
+                    result.startingFunds =
+                      TA.economy
+                        .applyStartingFundsQuote(
+                          run,
+                          fundsQuote
+                        );
+                  }
+
+                  return result;
+                },
+                {
+                  save: true,
+                  immediate: true
+                }
+              );
+
+            if (
+              reconciliation
+                .savePromise
+            ) {
+              await reconciliation
+                .savePromise;
+            }
+          }
+        }
 
         const footer =
           document.getElementById(
@@ -97652,6 +101044,3258 @@
 
     throw error;
   }
+})();
+</script>
+
+
+<script id="trail-atlas-playability-v10-diagnostics">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_PLAYABILITY_PATCH_V10";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.diagnostics ||
+    !TA.runFactory ||
+    !TA.economy ||
+    !TA.travel ||
+    !TA.partyActions ||
+    !TA.outcomes
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} diagnostics require the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.playabilityDiagnosticsVersion ===
+    PATCH_VERSION
+  ) {
+    return;
+  }
+
+  Object.defineProperty(
+    TA,
+    "playabilityDiagnosticsVersion",
+    {
+      value:
+        PATCH_VERSION,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  function recommendationOrder(
+    recommendation
+  ) {
+    const itemRank = {
+      "water-container": 0,
+      "pack-gear": 1,
+      "tool-kit": 2,
+      "animal-tack": 3,
+      clothing: 4,
+      bedding: 5,
+      footwear: 6,
+      rope: 7,
+      "navigation-kit": 8,
+      medicine: 9,
+      bandages: 10,
+      "sanitation-supplies": 11,
+      "repair-materials": 12,
+      "staple-food": 20,
+      fodder: 21,
+      water: 30
+    };
+
+    const priorityRank = {
+      essential: 0,
+      recommended: 1,
+      optional: 2
+    };
+
+    return (
+      (
+        itemRank[
+          recommendation.itemId
+        ] ?? 15
+      ) *
+        10 +
+      (
+        priorityRank[
+          recommendation.priority
+        ] ?? 3
+      )
+    );
+  }
+
+  function purchaseRecommendations(
+    run,
+    check,
+    options = {}
+  ) {
+    const strict =
+      options.strict !==
+      false;
+
+    const recommendations =
+      TA.economy
+        .recommendations(
+          run
+        )
+        .slice()
+        .sort(
+          (first, second) =>
+            recommendationOrder(
+              first
+            ) -
+            recommendationOrder(
+              second
+            )
+        );
+
+    const purchased = [];
+    const skipped = [];
+
+    for (
+      const recommendation of
+      recommendations
+    ) {
+      const current =
+        TA.runModel
+          .Inventory
+          .quantity(
+            run.inventory,
+            recommendation
+              .itemId
+          );
+
+      const quantity =
+        TA.util.roundTo(
+          Math.max(
+            0,
+            recommendation
+              .recommendedQuantity -
+              current
+          ),
+          3
+        );
+
+      if (quantity <= 0.0001) {
+        continue;
+      }
+
+      const quote =
+        TA.economy
+          .quotePurchase(
+            run,
+            recommendation
+              .itemId,
+            quantity
+          );
+
+      if (!quote.allowed) {
+        skipped.push({
+          itemId:
+            recommendation
+              .itemId,
+          priority:
+            recommendation
+              .priority,
+          quantity,
+          reasons:
+            quote.reasons
+              .slice()
+        });
+
+        if (
+          strict ||
+          recommendation.priority ===
+            "essential"
+        ) {
+          check(
+            false,
+            "The game could not purchase its own recommendation.",
+            {
+              routeId:
+                run.routeId,
+              professionId:
+                run.professionId,
+              modeId:
+                run.modeId,
+              recommendation,
+              quote,
+              funds:
+                run.economy
+                  .funds,
+              load:
+                TA.runModel
+                  .Transport
+                  .loadState(
+                    run
+                  )
+            }
+          );
+        }
+
+        continue;
+      }
+
+      TA.economy.buy(
+        run,
+        recommendation.itemId,
+        quantity
+      );
+
+      purchased.push({
+        itemId:
+          recommendation
+            .itemId,
+        quantity,
+        cost:
+          quote.cost
+      });
+    }
+
+    return {
+      recommendations,
+      purchased,
+      skipped,
+      fundsRemaining:
+        run.economy.funds,
+      load:
+        TA.runModel
+          .Transport
+          .loadState(
+            run
+          )
+    };
+  }
+
+  function prepareNormallyOutfittedRun(
+    route,
+    profession,
+    mode,
+    seed,
+    check
+  ) {
+    const world =
+      TA.persistence
+        .createFreshWorld({
+          worldId:
+            `world-v10-outfit-${route.id}-${profession.id}-${mode.id}`,
+          worldSeed:
+            `world-v10-outfit-${route.id}-${profession.id}-${mode.id}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        });
+
+    const run =
+      TA.runFactory.create(
+        {
+          routeId:
+            route.id,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          seed
+        },
+        world,
+        {
+          runId:
+            `run-v10-outfit-${route.id}-${profession.id}-${mode.id}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        }
+      );
+
+    const waterBeforeShopping =
+      TA.runModel
+        .Inventory
+        .quantity(
+          run.inventory,
+          "water"
+        );
+
+    const waterCapacityBeforeShopping =
+      TA.runModel
+        .Transport
+        .waterCapacity(
+          run
+        );
+
+    const initialForecast =
+      TA.runModel
+        .selectors
+        .supplyForecast(
+          run
+        );
+
+    check(
+      waterBeforeShopping <=
+        waterCapacityBeforeShopping +
+          0.001,
+      "A corrected route base kit still exceeds water capacity.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        waterBeforeShopping,
+        waterCapacityBeforeShopping
+      }
+    );
+
+    check(
+      initialForecast.waterDays ===
+        null ||
+      initialForecast.waterDays +
+        0.0001 >=
+        0.75,
+      "A corrected route base kit still contains less than 0.75 day of water.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        waterDays:
+          initialForecast
+            .waterDays,
+        waterBeforeShopping,
+        dailyNeeds:
+          initialForecast
+            .dailyNeeds
+      }
+    );
+
+    TA.economy
+      .acknowledgeBriefing(
+        run
+      );
+
+    const visit =
+      TA.economy
+        .openDepartureStore(
+          run
+        );
+
+    const purchases =
+      purchaseRecommendations(
+        run,
+        check,
+        {
+          strict: true
+        }
+      );
+
+    const readiness =
+      TA.economy
+        .assessOutfitting(
+          run
+        );
+
+    check(
+      readiness.canDepart,
+      "A profession could not depart after buying every recommendation.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        readiness,
+        purchases,
+        journeySupport:
+          run.economy
+            .journeySupport,
+        minimumJourneyBudget:
+          run.economy
+            .minimumJourneyBudget
+      }
+    );
+
+    check(
+      readiness.load.ratio <=
+        1.3 +
+          0.0001,
+      "The complete recommendation bundle exceeded the hard load limit.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        load:
+          readiness.load
+      }
+    );
+
+    check(
+      run.economy.funds >=
+        -0.0001,
+      "Recommended outfitting produced negative funds.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        funds:
+          run.economy
+            .funds
+      }
+    );
+
+    const serializable =
+      TA.util
+        .inspectSerializable(
+          run
+        );
+
+    check(
+      serializable.valid,
+      "Recommended outfitting produced non-serializable run state.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        serializable
+      }
+    );
+
+    return {
+      world,
+      run,
+      visit,
+      readiness,
+      purchases
+    };
+  }
+
+  function safeEventChoice(
+    view
+  ) {
+    if (
+      !view ||
+      !Array.isArray(
+        view.choices
+      )
+    ) {
+      return null;
+    }
+
+    const positive =
+      /(wait|rest|secure|careful|repair|maintain|pay|hire|present|authorized|assist|acclimat|prepare|study|filter|draw|modest|responsible|organized|lower|reduce|inspect|welcome|extinguish|refill|supervised|record|share|openly)/i;
+
+    const dangerous =
+      /(press|force|ignore|damaged|claim|intensive|argue|immediate|fully-loaded|fully loaded|use-site|maintain-schedule|cross-loaded|continue-unbalanced|take-grade-directly|endure|anyway)/i;
+
+    return view.choices
+      .filter(
+        (choice) =>
+          choice.enabled
+      )
+      .map(
+        (choice) => {
+          let score = 0;
+
+          const source =
+            `${choice.id} ${choice.label} ${choice.description}`;
+
+          if (
+            positive.test(
+              source
+            )
+          ) {
+            score += 40;
+          }
+
+          if (
+            dangerous.test(
+              source
+            )
+          ) {
+            score -= 60;
+          }
+
+          if (
+            Number.isFinite(
+              choice.chance
+            )
+          ) {
+            score +=
+              choice.chance *
+              25;
+          } else {
+            score += 8;
+          }
+
+          if (
+            /wait|rest|pay|hire|secure|assist|acclimat/i.test(
+              source
+            )
+          ) {
+            score += 15;
+          }
+
+          return {
+            choice,
+            score
+          };
+        }
+      )
+      .sort(
+        (first, second) =>
+          second.score -
+          first.score
+      )[0]
+      ?.choice || null;
+  }
+
+  function resolveAllActiveEvents(
+    run,
+    check
+  ) {
+    let guard = 0;
+
+    while (
+      run.events &&
+      run.events.active
+    ) {
+      guard += 1;
+
+      check(
+        guard < 40,
+        "A normal-play event queue did not settle.",
+        {
+          routeId:
+            run.routeId,
+          eventId:
+            run.events
+              .active.eventId
+        }
+      );
+
+      const view =
+        TA.eventEngine.view(
+          run
+        );
+
+      const choice =
+        safeEventChoice(
+          view
+        );
+
+      check(
+        Boolean(choice),
+        "A normal-play event had no enabled choice.",
+        {
+          routeId:
+            run.routeId,
+          event:
+            view
+        }
+      );
+
+      TA.eventEngine.resolve(
+        run,
+        choice.id
+      );
+    }
+  }
+
+  function purchaseAtCurrentMarket(
+    run,
+    check
+  ) {
+    const milestone =
+      TA.runModel
+        .selectors
+        .currentMilestone(
+          run
+        );
+
+    if (
+      !milestone ||
+      !milestone
+        .marketProfileId
+    ) {
+      return null;
+    }
+
+    const visit =
+      TA.economy.openMarket(
+        run,
+        milestone.id,
+        {
+          allowWithoutBriefing:
+            true
+        }
+      );
+
+    const purchases =
+      purchaseRecommendations(
+        run,
+        check,
+        {
+          strict: false
+        }
+      );
+
+    TA.economy.closeMarket(
+      run
+    );
+
+    return {
+      visitId:
+        visit.id,
+      purchases
+    };
+  }
+
+  function useHelpfulTownServices(
+    run
+  ) {
+    const milestone =
+      TA.runModel
+        .selectors
+        .currentMilestone(
+          run
+        );
+
+    if (!milestone) {
+      return null;
+    }
+
+    const used = [];
+
+    const candidates =
+      TA.partyActions
+        .conditions
+        .candidates(
+          run
+        );
+
+    const serious =
+      candidates.find(
+        (candidate) =>
+          candidate.severity >=
+          3
+      );
+
+    if (
+      serious &&
+      (
+        milestone.services ||
+        []
+      ).includes(
+        "healer"
+      )
+    ) {
+      const quote =
+        TA.partyActions
+          .quoteService(
+            run,
+            "healer",
+            {
+              memberId:
+                serious.memberId,
+              conditionId:
+                serious.conditionId
+            }
+          );
+
+      if (
+        quote.affordable
+      ) {
+        TA.partyActions
+          .useService(
+            run,
+            "healer",
+            {
+              memberId:
+                serious.memberId,
+              conditionId:
+                serious.conditionId
+            }
+          );
+
+        used.push(
+          "healer"
+        );
+
+        return used;
+      }
+    }
+
+    const durabilityRatio =
+      run.transport
+        .maximumDurability > 0
+        ? run.transport
+            .durability /
+          run.transport
+            .maximumDurability
+        : 0;
+
+    if (
+      durabilityRatio < 0.36 &&
+      (
+        milestone.services ||
+        []
+      ).includes(
+        "repair-shop"
+      )
+    ) {
+      const quote =
+        TA.partyActions
+          .quoteService(
+            run,
+            "repair-shop"
+          );
+
+      if (
+        quote.affordable
+      ) {
+        TA.partyActions
+          .useService(
+            run,
+            "repair-shop"
+          );
+
+        used.push(
+          "repair-shop"
+        );
+
+        return used;
+      }
+    }
+
+    if (
+      run.transport
+        .animalCount > 0 &&
+      run.transport
+        .animalCondition < 28 &&
+      (
+        milestone.services ||
+        []
+      ).includes(
+        "animal-care"
+      )
+    ) {
+      const quote =
+        TA.partyActions
+          .quoteService(
+            run,
+            "animal-care"
+          );
+
+      if (
+        quote.affordable
+      ) {
+        TA.partyActions
+          .useService(
+            run,
+            "animal-care"
+          );
+
+        used.push(
+          "animal-care"
+        );
+      }
+    }
+
+    return used;
+  }
+
+  function tryFieldTreatment(
+    run
+  ) {
+    const candidate =
+      TA.partyActions
+        .conditions
+        .candidates(
+          run
+        )
+        .find(
+          (entry) =>
+            entry.severity >=
+            2
+        );
+
+    if (!candidate) {
+      return false;
+    }
+
+    const supplies =
+      candidate.supplies;
+
+    if (
+      TA.runModel.Inventory
+        .quantity(
+          run.inventory,
+          "medicine"
+        ) <
+        supplies.medicine ||
+      TA.runModel.Inventory
+        .quantity(
+          run.inventory,
+          "bandages"
+        ) <
+        supplies.bandages ||
+      TA.runModel.Inventory
+        .quantity(
+          run.inventory,
+          "sanitation-supplies"
+        ) <
+        supplies.sanitation
+    ) {
+      return false;
+    }
+
+    try {
+      TA.partyActions.treat(
+        run,
+        {
+          memberId:
+            candidate.memberId,
+          conditionId:
+            candidate.conditionId
+        }
+      );
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function tryFieldRepair(
+    run
+  ) {
+    const durabilityRatio =
+      run.transport
+        .maximumDurability > 0
+        ? run.transport
+            .durability /
+          run.transport
+            .maximumDurability
+        : 0;
+
+    if (
+      durabilityRatio >= 0.48 &&
+      !run.flags
+        .transportDisabled
+    ) {
+      return false;
+    }
+
+    const materials =
+      TA.runModel.Inventory
+        .quantity(
+          run.inventory,
+          "repair-materials"
+        );
+
+    if (
+      materials < 1 ||
+      TA.runModel.Inventory
+        .quantity(
+          run.inventory,
+          "tool-kit"
+        ) < 1
+    ) {
+      return false;
+    }
+
+    try {
+      TA.partyActions.repair(
+        run,
+        {
+          materials:
+            Math.min(
+              3,
+              Math.max(
+                1,
+                Math.floor(
+                  materials
+                )
+              )
+            )
+        }
+      );
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function tryEmergencyProvisioning(
+    run
+  ) {
+    const supplies =
+      TA.runModel
+        .selectors
+        .supplyForecast(
+          run
+        );
+
+    let focus = null;
+
+    if (
+      supplies.waterDays !==
+        null &&
+      supplies.waterDays <
+        0.55
+    ) {
+      focus = "water";
+    } else if (
+      supplies.foodDays !==
+        null &&
+      supplies.foodDays <
+        2.5
+    ) {
+      focus = "food";
+    } else if (
+      run.transport
+        .animalCount > 0 &&
+      supplies.fodderDays !==
+        null &&
+      supplies.fodderDays <
+        0.8
+    ) {
+      focus = "fodder";
+    }
+
+    if (!focus) {
+      return false;
+    }
+
+    try {
+      TA.partyActions.provision(
+        run,
+        {
+          focus,
+          method:
+            "careful"
+        }
+      );
+
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  function nextPathSegment(
+    run,
+    pathSegmentIds
+  ) {
+    const index =
+      TA.content
+        .getRouteIndex(
+          run.routeId
+        );
+
+    return pathSegmentIds.find(
+      (segmentId) => {
+        const segment =
+          index.requireSegment(
+            segmentId
+          );
+
+        return (
+          segment.from ===
+            run.progress
+              .currentMilestoneId &&
+          !run.progress
+            .completedSegmentIds
+            .includes(
+              segmentId
+            )
+        );
+      }
+    ) || null;
+  }
+
+  async function simulateNormalCompletion(
+    route,
+    path,
+    profession,
+    mode,
+    check,
+    sequence
+  ) {
+    const world =
+      TA.persistence
+        .createFreshWorld({
+          worldId:
+            `world-v10-play-${route.id}-${profession.id}-${mode.id}-${sequence}`,
+          worldSeed:
+            `v10-play-${route.id}-${profession.id}-${mode.id}-${sequence}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        });
+
+    const run =
+      TA.runFactory.create(
+        {
+          routeId:
+            route.id,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          seed:
+            `v10-normal:${route.id}:${path.segmentIds.join("+")}:${profession.id}:${mode.id}`
+        },
+        world,
+        {
+          runId:
+            `run-v10-play-${route.id}-${profession.id}-${mode.id}-${sequence}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        }
+      );
+
+    world.activeRun =
+      run;
+
+    world.routeLedgers[
+      route.id
+    ].expeditionCount = 1;
+
+    world.statistics
+      .expeditionsStarted = 1;
+
+    TA.economy
+      .acknowledgeBriefing(
+        run
+      );
+
+    TA.economy
+      .openDepartureStore(
+        run
+      );
+
+    purchaseRecommendations(
+      run,
+      check,
+      {
+        strict: true
+      }
+    );
+
+    const finalized =
+      TA.economy
+        .finalizeOutfitting(
+          run,
+          {
+            acceptWarnings:
+              true
+          }
+        );
+
+    check(
+      finalized.finalized,
+      "Normal-play outfitting could not be finalized.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        assessment:
+          finalized.assessment
+      }
+    );
+
+    TA.travel.depart(
+      run
+    );
+
+    const processedStops =
+      new Set();
+
+    let iterations = 0;
+
+    const maximumIterations =
+      Math.max(
+        1200,
+        Math.ceil(
+          TA.runModel
+            .selectors
+            .itinerary(run)
+            .targetDays *
+            12
+        )
+      );
+
+    while (
+      run.status !==
+      "completed"
+    ) {
+      iterations += 1;
+
+      check(
+        iterations <
+          maximumIterations,
+        "Normal-play completion exceeded its safety limit.",
+        {
+          routeId:
+            route.id,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          path:
+            path.segmentIds,
+          day:
+            run.calendar
+              .dayIndex,
+          status:
+            run.status,
+          milestone:
+            run.progress
+              .currentMilestoneId,
+          segment:
+            run.progress
+              .currentSegmentId
+        }
+      );
+
+      resolveAllActiveEvents(
+        run,
+        check
+      );
+
+      check(
+        ![
+          "failed",
+          "abandoned"
+        ].includes(
+          run.status
+        ),
+        "A normal-play run ended before reaching its destination.",
+        {
+          routeId:
+            route.id,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          path:
+            path.segmentIds,
+          day:
+            run.calendar
+              .dayIndex,
+          status:
+            run.status,
+          alive:
+            TA.runModel.Party
+              .alive(run)
+              .length,
+          journal:
+            run.journal
+              .entries
+              .slice(-8)
+        }
+      );
+
+      if (
+        run.status ===
+        "completed"
+      ) {
+        break;
+      }
+
+      if (
+        [
+          "at-milestone",
+          "awaiting-choice"
+        ].includes(
+          run.status
+        )
+      ) {
+        const stopKey =
+          `${run.progress.currentMilestoneId}:` +
+          `${run.progress.completedSegmentIds.length}`;
+
+        if (
+          !processedStops.has(
+            stopKey
+          )
+        ) {
+          processedStops.add(
+            stopKey
+          );
+
+          purchaseAtCurrentMarket(
+            run,
+            check
+          );
+
+          useHelpfulTownServices(
+            run
+          );
+
+          resolveAllActiveEvents(
+            run,
+            check
+          );
+
+          if (
+            run.status ===
+            "completed"
+          ) {
+            break;
+          }
+        }
+
+        const segmentId =
+          nextPathSegment(
+            run,
+            path.segmentIds
+          );
+
+        check(
+          Boolean(segmentId),
+          "Normal play could not identify the next selected route segment.",
+          {
+            routeId:
+              route.id,
+            professionId:
+              profession.id,
+            modeId:
+              mode.id,
+            path:
+              path.segmentIds,
+            currentMilestoneId:
+              run.progress
+                .currentMilestoneId,
+            completed:
+              run.progress
+                .completedSegmentIds
+          }
+        );
+
+        TA.travel.beginSegment(
+          run,
+          segmentId
+        );
+
+        continue;
+      }
+
+      check(
+        run.status ===
+          "traveling",
+        "Normal play entered an unexpected run state.",
+        {
+          routeId:
+            route.id,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          status:
+            run.status
+        }
+      );
+
+      if (
+        tryEmergencyProvisioning(
+          run
+        )
+      ) {
+        continue;
+      }
+
+      const averageFatigue =
+        TA.runModel.Party
+          .average(
+            run,
+            "fatigue",
+            0
+          );
+
+      if (
+        averageFatigue >=
+        55
+      ) {
+        TA.partyActions.rest(
+          run,
+          {
+            days: 1
+          }
+        );
+
+        continue;
+      }
+
+      if (
+        tryFieldTreatment(
+          run
+        )
+      ) {
+        continue;
+      }
+
+      if (
+        tryFieldRepair(
+          run
+        )
+      ) {
+        continue;
+      }
+
+      if (
+        run.transport
+          .animalCount > 0 &&
+        run.transport
+          .animalCondition < 24
+      ) {
+        TA.partyActions.rest(
+          run,
+          {
+            days: 1
+          }
+        );
+
+        continue;
+      }
+
+      TA.travel.travelDays(
+        run,
+        {
+          days: 3
+        }
+      );
+    }
+
+    resolveAllActiveEvents(
+      run,
+      check
+    );
+
+    check(
+      run.progress
+        .currentMilestoneId ===
+        route.destinationMilestoneId,
+      "Completed normal play was not located at the destination.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        expected:
+          route
+            .destinationMilestoneId,
+        actual:
+          run.progress
+            .currentMilestoneId
+      }
+    );
+
+    check(
+      TA.runModel.Party
+        .alive(run)
+        .length > 0,
+      "No traveler survived a completed normal-play run.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    TA.outcomes.prepare(
+      run
+    );
+
+    const committed =
+      TA.outcomes.commit(
+        world,
+        run
+      );
+
+    check(
+      committed.committed &&
+      world.records.length ===
+        1,
+      "A normal-play completion did not commit exactly one Chronicle record.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        committed,
+        records:
+          world.records.length
+      }
+    );
+
+    check(
+      Number.isFinite(
+        run.score.final
+      ) &&
+      run.score.final > 0,
+      "A completed normal-play run did not produce a positive score.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        score:
+          run.score
+      }
+    );
+
+    const exported =
+      TA.persistence
+        .stringifyWorldDocument(
+          world,
+          false
+        );
+
+    const imported =
+      TA.persistence
+        .parseWorldDocument(
+          exported
+        );
+
+    check(
+      imported.world
+        .records.length ===
+        1 &&
+      imported.world
+        .records[0]
+        .runId ===
+        run.id,
+      "A normal-play result did not survive export and import.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    return {
+      routeId:
+        route.id,
+      professionId:
+        profession.id,
+      modeId:
+        mode.id,
+      segments:
+        path.segmentIds
+          .length,
+      days:
+        run.calendar
+          .dayIndex,
+      score:
+        run.score.final,
+      alive:
+        TA.runModel.Party
+          .alive(run)
+          .length,
+      journeySupport:
+        Number(
+          run.economy
+            .journeySupport
+        ) || 0,
+      recordId:
+        committed.record.id
+    };
+  }
+
+  TA.diagnostics.register({
+    id:
+      "balance.v10-itineraries",
+    label:
+      "V10 route calibration and branch itineraries are internally consistent",
+    group: "balance",
+    critical: true,
+    section: 20,
+    run({
+      assert: check
+    }) {
+      const results = [];
+
+      for (
+        const route of
+        TA.content.list(
+          "routes"
+        )
+      ) {
+        const calibration =
+          TA.runModel
+            .selectors
+            .routeCalibration(
+              route.id
+            );
+
+        check(
+          calibration.paths
+            .length > 0,
+          "A route has no calibrated itinerary.",
+          {
+            routeId:
+              route.id
+          }
+        );
+
+        check(
+          Math.abs(
+            calibration
+              .baseline
+              .distanceKm -
+            route.distanceKm
+          ) <
+            0.001,
+          "The calibrated baseline is not the route's declared shortest path.",
+          {
+            routeId:
+              route.id,
+            declared:
+              route.distanceKm,
+            calculated:
+              calibration
+                .baseline
+                .distanceKm
+          }
+        );
+
+        check(
+          calibration.scale >=
+            TA.journeyBalance
+              .routeCompressionMinimum &&
+          calibration.scale <=
+            TA.journeyBalance
+              .routeCompressionMaximum,
+          "A route compression scale is outside its safe bounds.",
+          {
+            routeId:
+              route.id,
+            scale:
+              calibration.scale
+          }
+        );
+
+        const diagnosticWorld =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                `world-v10-itinerary-${route.id}`,
+              worldSeed:
+                `v10-itinerary-${route.id}`,
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        for (
+          let index = 0;
+          index <
+            calibration.paths
+              .length;
+          index += 1
+        ) {
+          const path =
+            calibration.paths[
+              index
+            ];
+
+          const run =
+            TA.runFactory.create(
+              {
+                routeId:
+                  route.id,
+                professionId:
+                  "guide",
+                modeId:
+                  "standard",
+                seed:
+                  `v10-itinerary:${route.id}:${index}`
+              },
+              diagnosticWorld,
+              {
+                runId:
+                  `run-v10-itinerary-${route.id}-${index}`,
+                timestamp:
+                  "2000-01-01T00:00:00.000Z"
+              }
+            );
+
+          run.progress
+            .pathHistory =
+            path.segmentIds.map(
+              (segmentId) => ({
+                segmentId,
+                startDay: 0,
+                endDay: null
+              })
+            );
+
+          run.progress
+            .distanceTraveledKm =
+            route.distanceKm;
+
+          const itinerary =
+            TA.runModel
+              .selectors
+              .itinerary(
+                run
+              );
+
+          check(
+            Math.abs(
+              itinerary.distanceKm -
+              path.distanceKm
+            ) <
+              0.001,
+            "A selected branch did not use its own distance denominator.",
+            {
+              routeId:
+                route.id,
+              path:
+                path.segmentIds,
+              expected:
+                path.distanceKm,
+              actual:
+                itinerary
+                  .distanceKm
+            }
+          );
+
+          if (
+            path.distanceKm >
+            route.distanceKm +
+              0.001
+          ) {
+            check(
+              itinerary.fraction <
+                1,
+              "A longer branch displayed 100% progress before its destination.",
+              {
+                routeId:
+                  route.id,
+                path:
+                  path.segmentIds,
+                routeDistance:
+                  route.distanceKm,
+                selectedDistance:
+                  itinerary
+                    .distanceKm,
+                fraction:
+                  itinerary.fraction
+              }
+            );
+
+            check(
+              itinerary.targetDays >
+                calibration
+                  .baseTargetDays,
+              "A longer branch did not receive a larger score target.",
+              {
+                routeId:
+                  route.id,
+                path:
+                  path.segmentIds,
+                itinerary
+              }
+            );
+          }
+        }
+
+        results.push({
+          routeId:
+            route.id,
+          scale:
+            calibration.scale,
+          paths:
+            calibration.paths
+              .length,
+          distanceRangeKm:
+            calibration
+              .distanceRangeKm,
+          estimatedDaysRange:
+            calibration
+              .estimatedDaysRange,
+          targetDaysRange: [
+            calibration
+              .baseTargetDays,
+            calibration
+              .baseTargetDays +
+              calibration
+                .maximumExtraDays
+          ]
+        });
+      }
+
+      return {
+        routes:
+          results.length,
+        results
+      };
+    }
+  });
+
+  TA.diagnostics.register({
+    id:
+      "balance.v10-outfitting-matrix",
+    label:
+      "Every route, profession, and mode can afford and carry its recommendations",
+    group: "balance",
+    critical: true,
+    section: 20,
+    async run({
+      assert: check
+    }) {
+      const results = [];
+
+      let sequence = 0;
+
+      for (
+        const route of
+        TA.content.list(
+          "routes"
+        )
+      ) {
+        for (
+          const profession of
+          TA.content.list(
+            "professions"
+          )
+        ) {
+          for (
+            const mode of
+            TA.content.list(
+              "modes"
+            )
+          ) {
+            sequence += 1;
+
+            const prepared =
+              prepareNormallyOutfittedRun(
+                route,
+                profession,
+                mode,
+                `v10-outfit:${route.id}:${profession.id}:${mode.id}`,
+                check
+              );
+
+            results.push({
+              routeId:
+                route.id,
+              professionId:
+                profession.id,
+              modeId:
+                mode.id,
+              journeySupport:
+                Number(
+                  prepared.run
+                    .economy
+                    .journeySupport
+                ) || 0,
+              fundsRemaining:
+                prepared.run
+                  .economy
+                  .funds,
+              loadRatio:
+                prepared
+                  .readiness
+                  .load.ratio,
+              waterDays:
+                prepared
+                  .readiness
+                  .supplies
+                  .waterDays
+            });
+
+            if (
+              sequence % 12 ===
+              0
+            ) {
+              await TA.util.sleep(
+                0
+              );
+            }
+          }
+        }
+      }
+
+      return {
+        combinations:
+          results.length,
+        expected:
+          TA.content
+            .registry(
+              "routes"
+            )
+            .size *
+          TA.content
+            .registry(
+              "professions"
+            )
+            .size *
+          TA.content
+            .registry(
+              "modes"
+            )
+            .size,
+        maximumSupport:
+          Math.max(
+            0,
+            ...results.map(
+              (entry) =>
+                entry
+                  .journeySupport
+            )
+          ),
+        results
+      };
+    }
+  });
+
+  TA.diagnostics.register({
+    id:
+      "balance.v10-normal-playability",
+    label:
+      "Every profession and mode can complete every route path without diagnostic top-ups",
+    group: "balance",
+    critical: true,
+    section: 20,
+    async run({
+      assert: check
+    }) {
+      const results = [];
+
+      let sequence = 0;
+
+      for (
+        const route of
+        TA.content.list(
+          "routes"
+        )
+      ) {
+        const paths =
+          TA.runModel
+            .selectors
+            .routeCalibration(
+              route.id
+            )
+            .paths;
+
+        for (
+          const path of
+          paths
+        ) {
+          for (
+            const profession of
+            TA.content.list(
+              "professions"
+            )
+          ) {
+            for (
+              const mode of
+              TA.content.list(
+                "modes"
+              )
+            ) {
+              sequence += 1;
+
+              const result =
+                await simulateNormalCompletion(
+                  route,
+                  path,
+                  profession,
+                  mode,
+                  check,
+                  sequence
+                );
+
+              results.push(
+                result
+              );
+
+              if (
+                sequence % 4 ===
+                0
+              ) {
+                await TA.util.sleep(
+                  0
+                );
+              }
+            }
+          }
+        }
+      }
+
+      return {
+        combinations:
+          results.length,
+        routes:
+          TA.content
+            .registry(
+              "routes"
+            )
+            .size,
+        pathVariants:
+          TA.content
+            .list("routes")
+            .reduce(
+              (total, route) =>
+                total +
+                TA.runModel
+                  .selectors
+                  .routeCalibration(
+                    route.id
+                  )
+                  .paths
+                  .length,
+              0
+            ),
+        professions:
+          TA.content
+            .registry(
+              "professions"
+            )
+            .size,
+        modes:
+          TA.content
+            .registry(
+              "modes"
+            )
+            .size,
+        maximumDays:
+          Math.max(
+            0,
+            ...results.map(
+              (entry) =>
+                entry.days
+            )
+          ),
+        minimumScore:
+          Math.min(
+            ...results.map(
+              (entry) =>
+                entry.score
+            )
+          ),
+        results
+      };
+    }
+  });
+
+  document.documentElement
+    .dataset.playabilityPatch =
+    PATCH_VERSION;
+})();
+</script>
+
+
+<script id="trail-atlas-profession-funds-v11-diagnostics">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_PROFESSION_FUNDS_BYLINE_PATCH_V11";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.diagnostics ||
+    !TA.runFactory ||
+    !TA.economy ||
+    !TA.SceneDirector
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} diagnostics require the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.professionFundsBylinePatchVersion ===
+    PATCH_VERSION
+  ) {
+    return;
+  }
+
+  Object.defineProperty(
+    TA,
+    "professionFundsBylinePatchVersion",
+    {
+      value:
+        PATCH_VERSION,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  TA.diagnostics.register({
+    id:
+      "balance.v11-profession-funds-order",
+    label:
+      "V11 adjusted starting cash follows the authored profession wealth order",
+    group: "balance",
+    critical: true,
+    section: 20,
+    run({
+      assert: check
+    }) {
+      const professions =
+        TA.content
+          .list("professions")
+          .slice()
+          .sort(
+            (first, second) =>
+              first.fundsMultiplier -
+                second.fundsMultiplier ||
+              first.order -
+                second.order
+          );
+
+      const results = [];
+
+      let combinations = 0;
+
+      for (
+        const route of
+        TA.content.list(
+          "routes"
+        )
+      ) {
+        for (
+          const mode of
+          TA.content.list(
+            "modes"
+          )
+        ) {
+          /*
+           * Use the same seed across professions so deterministic departure
+           * stock and market variation remain directly comparable.
+           */
+          const sharedSeed =
+            `v11-funds:${route.id}:${mode.id}`;
+
+          const row = [];
+
+          for (
+            const profession of
+            professions
+          ) {
+            combinations += 1;
+
+            const diagnosticWorld =
+              TA.persistence
+                .createFreshWorld({
+                  worldId:
+                    `world-v11-funds-${route.id}-${mode.id}-${profession.id}`,
+                  worldSeed:
+                    `world-v11-funds-${route.id}-${mode.id}`,
+                  timestamp:
+                    "2000-01-01T00:00:00.000Z"
+                });
+
+            const run =
+              TA.runFactory.create(
+                {
+                  routeId:
+                    route.id,
+                  professionId:
+                    profession.id,
+                  modeId:
+                    mode.id,
+                  seed:
+                    sharedSeed
+                },
+                diagnosticWorld,
+                {
+                  runId:
+                    `run-v11-funds-${route.id}-${mode.id}-${profession.id}`,
+                  timestamp:
+                    "2000-01-01T00:00:00.000Z"
+                }
+              );
+
+            TA.economy
+              .acknowledgeBriefing(
+                run
+              );
+
+            TA.economy
+              .openDepartureStore(
+                run
+              );
+
+            const profile =
+              TA.economy
+                .authoredStartingFundsProfile(
+                  run
+                );
+
+            const expected =
+              Math.max(
+                profile
+                  .authoredStartingFunds,
+                run.economy
+                  .minimumJourneyBudget +
+                  profile
+                    .authoredCashAdvantage
+              );
+
+            check(
+              Math.abs(
+                run.economy
+                  .startingFunds -
+                  expected
+              ) <= 0.011,
+              "Adjusted starting funds did not match the V11 target.",
+              {
+                routeId:
+                  route.id,
+                modeId:
+                  mode.id,
+                professionId:
+                  profession.id,
+                expected,
+                actual:
+                  run.economy
+                    .startingFunds,
+                profile,
+                minimumJourneyBudget:
+                  run.economy
+                    .minimumJourneyBudget
+              }
+            );
+
+            check(
+              run.flags
+                .startingFundsBalanceVersion ===
+                TA.economy
+                  .STARTING_FUNDS_BALANCE_VERSION,
+              "The V11 starting-funds version marker was not stored.",
+              {
+                routeId:
+                  route.id,
+                modeId:
+                  mode.id,
+                professionId:
+                  profession.id,
+                actual:
+                  run.flags
+                    .startingFundsBalanceVersion
+              }
+            );
+
+            row.push({
+              professionId:
+                profession.id,
+              multiplier:
+                profession
+                  .fundsMultiplier,
+              startingFunds:
+                run.economy
+                  .startingFunds,
+              sustainableBudget:
+                run.economy
+                  .minimumJourneyBudget,
+              authoredCashAdvantage:
+                run.economy
+                  .professionCashAdvantage
+            });
+          }
+
+          for (
+            let index = 1;
+            index < row.length;
+            index += 1
+          ) {
+            check(
+              row[index]
+                .startingFunds >
+                row[index - 1]
+                  .startingFunds,
+              "Profession starting cash was not strictly ordered by its authored funds multiplier.",
+              {
+                routeId:
+                  route.id,
+                modeId:
+                  mode.id,
+                poorer:
+                  row[index - 1],
+                richer:
+                  row[index],
+                row
+              }
+            );
+          }
+
+          check(
+            row[0]
+              .professionId ===
+              "scholar",
+            "Scholar is no longer the lowest authored cash profession.",
+            {
+              routeId:
+                route.id,
+              modeId:
+                mode.id,
+              row
+            }
+          );
+
+          check(
+            row[row.length - 1]
+              .professionId ===
+              "financier",
+            "Financier/Banker is no longer the highest authored cash profession.",
+            {
+              routeId:
+                route.id,
+              modeId:
+                mode.id,
+              row
+            }
+          );
+
+          results.push({
+            routeId:
+              route.id,
+            modeId:
+              mode.id,
+            lowest:
+              row[0],
+            highest:
+              row[
+                row.length - 1
+              ],
+            row
+          });
+        }
+      }
+
+      return {
+        combinations,
+        expected:
+          TA.content
+            .registry("routes")
+            .size *
+          TA.content
+            .registry("modes")
+            .size *
+          TA.content
+            .registry("professions")
+            .size,
+        results
+      };
+    }
+  });
+
+  TA.diagnostics.register({
+    id:
+      "ui.v11-splash-byline",
+    label:
+      "V11 startup splash and title accessibility include the author byline",
+    group: "ui",
+    critical: true,
+    section: 20,
+    run({
+      assert: check
+    }) {
+      const loadingByline =
+        document.querySelector(
+          "#scene-loading .scene-loading__byline"
+        );
+
+      check(
+        Boolean(
+          loadingByline
+        ),
+        "The initial HTML splash byline is missing."
+      );
+
+      check(
+        loadingByline &&
+        loadingByline
+          .textContent
+          .trim() ===
+          "By: Matthew Taraschke",
+        "The initial HTML splash byline is incorrect.",
+        {
+          actual:
+            loadingByline
+              ? loadingByline
+                  .textContent
+              : null
+        }
+      );
+
+      const titleScene =
+        TA.SceneDirector
+          .title();
+
+      check(
+        titleScene
+          .description
+          .includes(
+            "By: Matthew Taraschke"
+          ),
+        "The Canvas title scene accessibility description is missing the byline.",
+        {
+          description:
+            titleScene
+              .description
+        }
+      );
+
+      return {
+        byline:
+          loadingByline
+            .textContent
+            .trim(),
+        titleDescription:
+          titleScene
+            .description
+      };
+    }
+  });
+
+  document.documentElement
+    .dataset.professionFundsPatch =
+    PATCH_VERSION;
+})();
+</script>
+
+
+<script id="trail-atlas-starting-funds-parity-v12-diagnostics">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_STARTING_FUNDS_UI_PARITY_PATCH_V12";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.diagnostics ||
+    !TA.economy ||
+    !TA.runFactory ||
+    !TA.GameService
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} diagnostics require the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.startingFundsUiParityPatchVersion ===
+    PATCH_VERSION
+  ) {
+    return;
+  }
+
+  Object.defineProperty(
+    TA,
+    "startingFundsUiParityPatchVersion",
+    {
+      value:
+        PATCH_VERSION,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  function currencyTolerance(
+    route
+  ) {
+    const decimals =
+      Math.max(
+        0,
+        Math.trunc(
+          Number(
+            route.economy
+              .currency
+              .decimals
+          ) || 0
+        )
+      );
+
+    return (
+      0.5 *
+      10 **
+        (
+          -decimals
+        )
+    ) +
+    1e-9;
+  }
+
+  function assertFundsEqual(
+    check,
+    route,
+    expected,
+    actual,
+    label,
+    details = {}
+  ) {
+    check(
+      Math.abs(
+        Number(expected) -
+        Number(actual)
+      ) <=
+        currencyTolerance(
+          route
+        ),
+      `${label} did not match the authoritative starting funds.`,
+      {
+        routeId:
+          route.id,
+        expected,
+        actual,
+        ...details
+      }
+    );
+  }
+
+  async function createDiagnosticService(
+    label
+  ) {
+    const adapter =
+      new TA.persistence
+        .MemoryStorageAdapter();
+
+    const store =
+      new TA.persistence
+        .WorldStore({
+          adapter,
+          schema:
+            TA.worldSchema,
+          broadcast: false,
+          label
+        });
+
+    const service =
+      new TA.GameService(
+        store,
+        {
+          broadcast: false,
+          registerDefaults:
+            false,
+          label
+        }
+      );
+
+    await service.initialize({
+      persistIfNew:
+        false
+    });
+
+    return {
+      store,
+      service
+    };
+  }
+
+  function verifyOneCombination(
+    check,
+    world,
+    service,
+    route,
+    profession,
+    mode,
+    seed
+  ) {
+    const worldChecksumBefore =
+      TA.hash.checksum(
+        world
+      );
+
+    const setupModel =
+      service.view(
+        "setup",
+        {
+          routeId:
+            route.id,
+          modeId:
+            mode.id,
+          seed,
+          replaceActive:
+            false
+        }
+      );
+
+    const card =
+      setupModel
+        .professions
+        .find(
+          (entry) =>
+            entry.id ===
+            profession.id
+        );
+
+    check(
+      Boolean(card),
+      "The profession card was missing from the setup view.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    const worldChecksumAfter =
+      TA.hash.checksum(
+        world
+      );
+
+    check(
+      worldChecksumAfter ===
+        worldChecksumBefore,
+      "Generating profession-card funds mutated the persistent world.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    const run =
+      TA.runFactory.create(
+        {
+          routeId:
+            route.id,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          seed
+        },
+        world,
+        {
+          runId:
+            `run-v12-parity-${route.id}-${profession.id}-${mode.id}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        }
+      );
+
+    const quote =
+      TA.economy
+        .startingFundsQuoteForRun(
+          run
+        );
+
+    TA.economy
+      .applyStartingFundsQuote(
+        run,
+        quote
+      );
+
+    const displayed =
+      card.funds;
+
+    assertFundsEqual(
+      check,
+      route,
+      displayed,
+      run.economy
+        .startingFunds,
+      "Profession-card funds",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        seed
+      }
+    );
+
+    assertFundsEqual(
+      check,
+      route,
+      displayed,
+      run.setup
+        .initialFunds,
+      "Run setup initialFunds",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    assertFundsEqual(
+      check,
+      route,
+      displayed,
+      run.economy.funds,
+      "Initial spendable funds",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    const briefing =
+      TA.economy.briefing(
+        run
+      );
+
+    assertFundsEqual(
+      check,
+      route,
+      displayed,
+      briefing.funds,
+      "Departure briefing funds",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    TA.economy
+      .acknowledgeBriefing(
+        run
+      );
+
+    TA.economy
+      .openDepartureStore(
+        run
+      );
+
+    assertFundsEqual(
+      check,
+      route,
+      displayed,
+      run.economy
+        .startingFunds,
+      "Funds after opening the departure store",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    assertFundsEqual(
+      check,
+      route,
+      displayed,
+      run.economy.funds,
+      "Spendable funds after opening the departure store",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    const adjustments =
+      run.economy
+        .transactions
+        .filter(
+          (transaction) =>
+            transaction.type ===
+              "starting-funds-adjustment" &&
+            transaction
+              .balanceVersion ===
+              TA.economy
+                .STARTING_FUNDS_BALANCE_VERSION
+        );
+
+    check(
+      adjustments.length <=
+        1,
+      "Opening the departure store duplicated the starting-funds adjustment.",
+      {
+        routeId:
+          route.id,
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        adjustments
+      }
+    );
+
+    return {
+      routeId:
+        route.id,
+      professionId:
+        profession.id,
+      modeId:
+        mode.id,
+      seed,
+      displayedFunds:
+        displayed,
+      startingFunds:
+        run.economy
+          .startingFunds,
+      journeySupport:
+        Number(
+          run.economy
+            .journeySupport
+        ) || 0
+    };
+  }
+
+  TA.diagnostics.register({
+    id:
+      "repair.starting-funds-parity",
+    label:
+      "Starting-funds setup card matches the real run and departure store",
+    group: "repair",
+    critical: true,
+    section: 20,
+    async run({
+      assert: check
+    }) {
+      const {
+        store,
+        service
+      } =
+        await createDiagnosticService(
+          "Starting-funds parity smoke test"
+        );
+
+      const route =
+        TA.content.require(
+          "routes",
+          "oregon-trail"
+        );
+
+      const profession =
+        TA.content.require(
+          "professions",
+          "scholar"
+        );
+
+      const mode =
+        TA.content.require(
+          "modes",
+          "standard"
+        );
+
+      const result =
+        verifyOneCombination(
+          check,
+          store.peek(),
+          service,
+          route,
+          profession,
+          mode,
+          "v12-starting-funds-smoke-seed"
+        );
+
+      return {
+        patchVersion:
+          PATCH_VERSION,
+        result
+      };
+    }
+  });
+
+  TA.diagnostics.register({
+    id:
+      "balance.v12-starting-funds-ui-parity",
+    label:
+      "All route, profession, and mode cards match actual adjusted starting funds",
+    group: "balance",
+    critical: true,
+    section: 20,
+    async run({
+      assert: check
+    }) {
+      const {
+        store,
+        service
+      } =
+        await createDiagnosticService(
+          "Starting-funds full parity matrix"
+        );
+
+      const world =
+        store.peek();
+
+      const originalChecksum =
+        TA.hash.checksum(
+          world
+        );
+
+      const results = [];
+
+      let sequence = 0;
+
+      for (
+        const route of
+        TA.content.list(
+          "routes"
+        )
+      ) {
+        for (
+          const mode of
+          TA.content.list(
+            "modes"
+          )
+        ) {
+          const seed =
+            `v12-parity:${route.id}:${mode.id}`;
+
+          const setupModel =
+            service.view(
+              "setup",
+              {
+                routeId:
+                  route.id,
+                modeId:
+                  mode.id,
+                seed,
+                replaceActive:
+                  false
+              }
+            );
+
+          for (
+            const profession of
+            TA.content.list(
+              "professions"
+            )
+          ) {
+            sequence += 1;
+
+            const card =
+              setupModel
+                .professions
+                .find(
+                  (entry) =>
+                    entry.id ===
+                    profession.id
+                );
+
+            check(
+              Boolean(card),
+              "A profession card was missing from the parity matrix.",
+              {
+                routeId:
+                  route.id,
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id
+              }
+            );
+
+            const run =
+              TA.runFactory.create(
+                {
+                  routeId:
+                    route.id,
+                  professionId:
+                    profession.id,
+                  modeId:
+                    mode.id,
+                  seed
+                },
+                world,
+                {
+                  runId:
+                    `run-v12-matrix-${route.id}-${profession.id}-${mode.id}`,
+                  timestamp:
+                    "2000-01-01T00:00:00.000Z"
+                }
+              );
+
+            const quote =
+              TA.economy
+                .startingFundsQuoteForRun(
+                  run
+                );
+
+            TA.economy
+              .applyStartingFundsQuote(
+                run,
+                quote
+              );
+
+            assertFundsEqual(
+              check,
+              route,
+              card.funds,
+              run.economy
+                .startingFunds,
+              "Profession-card funds",
+              {
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id,
+                seed
+              }
+            );
+
+            assertFundsEqual(
+              check,
+              route,
+              card.funds,
+              run.setup
+                .initialFunds,
+              "Party setup initialFunds",
+              {
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id
+              }
+            );
+
+            const briefing =
+              TA.economy.briefing(
+                run
+              );
+
+            assertFundsEqual(
+              check,
+              route,
+              card.funds,
+              briefing.funds,
+              "Briefing funds",
+              {
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id
+              }
+            );
+
+            TA.economy
+              .acknowledgeBriefing(
+                run
+              );
+
+            TA.economy
+              .openDepartureStore(
+                run
+              );
+
+            assertFundsEqual(
+              check,
+              route,
+              card.funds,
+              run.economy
+                .startingFunds,
+              "Post-store starting funds",
+              {
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id
+              }
+            );
+
+            assertFundsEqual(
+              check,
+              route,
+              card.funds,
+              run.economy
+                .funds,
+              "Post-store spendable funds",
+              {
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id
+              }
+            );
+
+            results.push({
+              routeId:
+                route.id,
+              professionId:
+                profession.id,
+              modeId:
+                mode.id,
+              funds:
+                card.funds,
+              support:
+                Number(
+                  run.economy
+                    .journeySupport
+                ) || 0
+            });
+
+            if (
+              sequence % 24 ===
+              0
+            ) {
+              await TA.util.sleep(
+                0
+              );
+            }
+          }
+        }
+      }
+
+      check(
+        TA.hash.checksum(
+          store.peek()
+        ) ===
+          originalChecksum,
+        "The full setup-card parity matrix mutated its source world."
+      );
+
+      return {
+        combinations:
+          results.length,
+        expected:
+          TA.content
+            .registry(
+              "routes"
+            )
+            .size *
+          TA.content
+            .registry(
+              "professions"
+            )
+            .size *
+          TA.content
+            .registry(
+              "modes"
+            )
+            .size,
+        results
+      };
+    }
+  });
+
+  TA.diagnostics.register({
+    id:
+      "balance.v12-replacement-funds-parity",
+    label:
+      "Replacement expeditions retain profession-card starting-funds parity",
+    group: "balance",
+    critical: true,
+    section: 20,
+    async run({
+      assert: check
+    }) {
+      const adapter =
+        new TA.persistence
+          .MemoryStorageAdapter();
+
+      const store =
+        new TA.persistence
+          .WorldStore({
+            adapter,
+            schema:
+              TA.worldSchema,
+            broadcast: false,
+            label:
+              "Replacement funds parity store"
+          });
+
+      const service =
+        new TA.GameService(
+          store,
+          {
+            broadcast: false,
+            registerDefaults:
+              true,
+            label:
+              "Replacement funds parity service"
+          }
+        );
+
+      await service.initialize({
+        persistIfNew:
+          false
+      });
+
+      await service.dispatch(
+        "expedition.start",
+        {
+          setup: {
+            routeId:
+              "oregon-trail",
+            professionId:
+              "financier",
+            modeId:
+              "standard",
+            seed:
+              "v12-replacement-first"
+          }
+        }
+      );
+
+      await service.dispatch(
+        "briefing.acknowledge"
+      );
+
+      await service.dispatch(
+        "store.open"
+      );
+
+      await service.dispatch(
+        "store.buy",
+        {
+          itemId:
+            "staple-food",
+          quantity: 5
+        }
+      );
+
+      const secondSeed =
+        "v12-replacement-second";
+
+      const setupModel =
+        service.view(
+          "setup",
+          {
+            routeId:
+              "oregon-trail",
+            modeId:
+              "standard",
+            seed:
+              secondSeed,
+            replaceActive:
+              true
+          }
+        );
+
+      const card =
+        setupModel
+          .professions
+          .find(
+            (entry) =>
+              entry.id ===
+              "scholar"
+          );
+
+      check(
+        Boolean(card),
+        "Replacement setup did not contain the Scholar profession card."
+      );
+
+      await service.dispatch(
+        "expedition.start",
+        {
+          setup: {
+            routeId:
+              "oregon-trail",
+            professionId:
+              "scholar",
+            modeId:
+              "standard",
+            seed:
+              secondSeed
+          },
+          abandonExisting:
+            true,
+          abandonConfirmation:
+            "ABANDON"
+        }
+      );
+
+      const run =
+        store.peek()
+          .activeRun;
+
+      const route =
+        TA.content.require(
+          "routes",
+          "oregon-trail"
+        );
+
+      assertFundsEqual(
+        check,
+        route,
+        card.funds,
+        run.economy
+          .startingFunds,
+        "Replacement expedition funds",
+        {
+          seed:
+            secondSeed
+        }
+      );
+
+      assertFundsEqual(
+        check,
+        route,
+        card.funds,
+        run.setup
+          .initialFunds,
+        "Replacement expedition setup initialFunds",
+        {
+          seed:
+            secondSeed
+        }
+      );
+
+      return {
+        displayedFunds:
+          card.funds,
+        actualFunds:
+          run.economy
+            .startingFunds,
+        priorRecords:
+          store.peek()
+            .records.length
+      };
+    }
+  });
+
+  document.documentElement
+    .dataset.startingFundsParityPatch =
+    PATCH_VERSION;
 })();
 </script>
 
@@ -98469,7 +105113,8 @@
             ]
           ) || 0
         ) *
-          20;
+          TA.economy
+            .waterContainerCapacityLiters();
 
       check(
         availableContainerCapacity +
@@ -98497,7 +105142,8 @@
                 run.transport
                   .baseWaterCapacityLiters
             ) /
-              20
+              TA.economy
+                .waterContainerCapacityLiters()
           )
         );
 
@@ -98549,9 +105195,9 @@
 
   TA.diagnostics.register({
     id:
-      "repair.all-route-completion",
+      "repair.route-graph-serialization",
     label:
-      "All route paths reach a committed, serializable outcome",
+      "All route graphs connect and serialize under synthetic diagnostic resources",
     group: "repair",
     critical: true,
     section: 20,
