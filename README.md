@@ -4,4 +4,4 @@
 ===
 EARLY DEMONSTRATION
 
-This application hasn't been heavily tested or balanced yet. In its current state it is very difficult to win, but the gameloop is fully functional.
+This application hasn't been heavily tested or balanced yet, but the gameloop is fully functional.
