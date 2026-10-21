@@ -4,4 +4,4 @@
 ===
 EARLY DEMONSTRATION
 
-This application hasn't been heavily tested or balanced yet, but the gameloop is fully functional.
+This application is more or less in a playable state, but needs additional testing to confirm play-ability for all routes and challenge levels. 
