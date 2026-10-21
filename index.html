@@ -1,4 +1,10 @@
 <!doctype html>
+<!-- TRAIL_ATLAS_GUIDED_LEARNING_PATCH_V13 -->
+<!-- TRAIL_ATLAS_HUMAN_WINNABILITY_PATCH_V14 -->
+<!-- TRAIL_ATLAS_HUMANE_PRESSURE_FAIL_FORWARD_PATCH_V15 -->
+<!-- TRAIL_ATLAS_SOLVENCY_AND_LOGISTICS_PATCH_V16 -->
+<!-- TRAIL_ATLAS_V16_PURCHASE_STEP_ROUNDING_HOTFIX -->
+<!-- TRAIL_ATLAS_V16_ESSENTIAL_STOCK_AND_SMOKE_HOTFIX -->
 <!-- TRAIL_ATLAS_REPAIR_V7_APPLIED -->
 <!-- TRAIL_ATLAS_TARGETED_UX_ROUTE_PATCH_V8 -->
 <!-- TRAIL_ATLAS_SCENE_AUDIO_PATCH_V9 -->
@@ -10524,13 +10530,13 @@
         name: "Learning",
         shortName: "Learning",
         description:
-          "More complete forecasts, gentler resource pressure, and one emergency evacuation safeguard.",
+          "Complete forecasts, substantially reduced journey pressure, guided risk stops, one early traveler stabilization, and score-penalized hard-lock recovery whenever an expedition becomes irrecoverable.",
         scoreMultiplier: 0.75,
         startingFundsFactor: 1.1,
-        consumptionFactor: 0.9,
-        wearFactor: 0.82,
-        healthRiskFactor: 0.72,
-        eventRiskFactor: 0.8,
+        consumptionFactor: 0.55,
+        wearFactor: 0.45,
+        healthRiskFactor: 0.35,
+        eventRiskFactor: 0.2,
         forecastLevel: 3,
         rescueTokens: 1,
         order: 1
@@ -10540,13 +10546,13 @@
         name: "Standard",
         shortName: "Standard",
         description:
-          "The intended balance of information, uncertainty, and expedition risk.",
+          "A humane intended balance of information, uncertainty, and expedition risk, with visible safety stops and score-penalized hard-lock recovery whenever an expedition becomes irrecoverable.",
         scoreMultiplier: 1,
         startingFundsFactor: 1,
-        consumptionFactor: 1,
-        wearFactor: 1,
-        healthRiskFactor: 1,
-        eventRiskFactor: 1,
+        consumptionFactor: 0.7,
+        wearFactor: 0.6,
+        healthRiskFactor: 0.5,
+        eventRiskFactor: 0.35,
         forecastLevel: 2,
         rescueTokens: 0,
         order: 2
@@ -10556,13 +10562,13 @@
         name: "Expedition",
         shortName: "Expedition",
         description:
-          "Tighter funds, less certain forecasts, and greater consequences for poor preparation.",
+          "The most demanding humane mode: less certain forecasts, stronger resource pressure, greater consequences for poor preparation, and costly score-penalized hard-lock recovery when required.",
         scoreMultiplier: 1.3,
         startingFundsFactor: 0.9,
-        consumptionFactor: 1.08,
-        wearFactor: 1.15,
-        healthRiskFactor: 1.18,
-        eventRiskFactor: 1.2,
+        consumptionFactor: 0.85,
+        wearFactor: 0.75,
+        healthRiskFactor: 0.65,
+        eventRiskFactor: 0.5,
         forecastLevel: 1,
         rescueTokens: 0,
         order: 3
@@ -14894,7 +14900,7 @@
           },
           services: [],
           codexIds: ["oregon-independence-rock"],
-          tags: ["landmark", "schedule"]
+          tags: ["landmark", "schedule", "water"]
         },
         {
           id: "south-pass",
@@ -14912,7 +14918,7 @@
           },
           services: [],
           codexIds: ["oregon-south-pass"],
-          tags: ["divide", "elevation", "weather"]
+          tags: ["divide", "elevation", "weather", "water"]
         },
         {
           id: "fort-bridger",
@@ -29097,20 +29103,20 @@
      */
     const JOURNEY_BALANCE = Object.freeze({
       patchVersion:
-        "TRAIL_ATLAS_PLAYABILITY_PATCH_V11",
+        "TRAIL_ATLAS_HUMANE_PRESSURE_FAIL_FORWARD_PATCH_V15",
 
       travelFatiguePerDay: 5,
       restRecoveryPerDay: 28,
       lodgingRecoveryPerDay: 34,
       waitRecoveryPerDay: 12,
 
-      travelEventRate: 0.10,
-      campEventRate: 0.06,
-      milestoneEventRate: 0.30,
-      afterActionEventRate: 0.06,
-      departureEventRate: 0.08,
-      townEventRate: 0.20,
-      minimumRandomEventGapDays: 3,
+      travelEventRate: 0.08,
+      campEventRate: 0.04,
+      milestoneEventRate: 0.25,
+      afterActionEventRate: 0.04,
+      departureEventRate: 0.06,
+      townEventRate: 0.15,
+      minimumRandomEventGapDays: 7,
 
       /*
        * Expected calendar delay from ordinary weather, incident choices,
@@ -29160,6 +29166,135 @@
         })
       })
     });
+
+
+    /*
+     * TRAIL_ATLAS_GUIDED_LEARNING_PATCH_V13
+     *
+     * These values do not replace route content or Standard/Expedition
+     * behavior. They make the existing Learning-mode promises operational and
+     * centralize the same thresholds previously known only to diagnostics.
+     */
+    const LEARNING_ASSIST = Object.freeze({
+      fatigueGainFactor: 0.45,
+      fatigueGuard: 55,
+      criticalHealthGuard: 40,
+      foodGuardDays: 2.5,
+      waterGuardDays: 0.55,
+      fodderGuardDays: 0.8,
+      durabilityGuardRatio: 0.48,
+      animalGuardCondition: 28,
+      conditionGuardSeverity: 2,
+
+      /*
+       * A load that the store already considers legally purchasable must not
+       * nearly double the calendar length in the easiest mode.
+       */
+      minimumLegalLoadMovementFactor: 0.9,
+      maximumGuidedLoadRatio: 1.3,
+
+      rescueHealth: 25,
+      rescueFatigue: 50,
+      rescueNutrition: 65,
+      rescueHydration: 65,
+      rescueDurabilityRatio: 0.25,
+      rescueAnimalCondition: 25,
+      rescueFoodDays: 2.5,
+      rescueWaterDays: 1.5,
+      rescueFodderDays: 1,
+      rescueScorePenalty: 500,
+
+      emergencyRecoveryTokens: 1,
+      emergencyRecoveryScorePenaltyByMode:
+        Object.freeze({
+          learning: 500,
+          standard: 1000,
+          expedition: 1500
+        })
+    });
+
+    /*
+     * TRAIL_ATLAS_HUMANE_PRESSURE_FAIL_FORWARD_PATCH_V15
+     *
+     * Final effective pressure factors relative to the old Standard baseline.
+     * These values replace the inconsistent mixture of mode factors that was
+     * previously applied by individual subsystems.
+     */
+    const HUMAN_PRESSURE = Object.freeze({
+      patchVersion:
+        "TRAIL_ATLAS_HUMANE_PRESSURE_FAIL_FORWARD_PATCH_V15",
+
+      minimumRandomEventGapDays: 7,
+
+      modes: Object.freeze({
+        learning: Object.freeze({
+          consumption: 0.55,
+          fatigue: 0.45,
+          wear: 0.45,
+          health: 0.35,
+          event: 0.2
+        }),
+
+        standard: Object.freeze({
+          consumption: 0.7,
+          fatigue: 0.6,
+          wear: 0.6,
+          health: 0.5,
+          event: 0.35
+        }),
+
+        expedition: Object.freeze({
+          consumption: 0.85,
+          fatigue: 0.75,
+          wear: 0.75,
+          health: 0.65,
+          event: 0.5
+        })
+      })
+    });
+
+    function humanPressureFactor(
+      runOrModeId,
+      facet
+    ) {
+      const modeId =
+        typeof runOrModeId ===
+          "string"
+          ? runOrModeId
+          : runOrModeId &&
+            typeof runOrModeId
+              .modeId ===
+              "string"
+            ? runOrModeId
+                .modeId
+            : "standard";
+
+      const profile =
+        HUMAN_PRESSURE
+          .modes[modeId] ||
+        HUMAN_PRESSURE
+          .modes.standard;
+
+      const value =
+        Number(
+          profile[facet]
+        );
+
+      return (
+        Number.isFinite(value) &&
+        value > 0
+      )
+        ? value
+        : 1;
+    }
+
+    const HumanPressure =
+      Object.freeze({
+        profile:
+          HUMAN_PRESSURE,
+        factor:
+          humanPressureFactor
+      });
 
     /* ======================================================================
        01. INVENTORY MODEL
@@ -32057,7 +32192,11 @@
           movementDays *
           JOURNEY_BALANCE
             .travelFatiguePerDay *
-          terrain.fatigueFactor
+          terrain.fatigueFactor *
+          humanPressureFactor(
+            run,
+            "fatigue"
+          )
         ) /
         JOURNEY_BALANCE
           .restRecoveryPerDay;
@@ -32221,45 +32360,53 @@
     function dailyNeeds(run) {
       const route =
         selectedRoute(run);
-      const mode =
-        selectedMode(run);
+
       const living =
         aliveMembers(run).length;
+
       const transportType =
         selectedTransportType(
           run
+        );
+
+      const consumptionPressure =
+        humanPressureFactor(
+          run,
+          "consumption"
         );
 
       const food =
         route.consumption
           .foodKgPerPersonDay *
         living *
-        mode.consumptionFactor *
+        consumptionPressure *
         RATION_POLICIES[
           run.policies.rations
         ].foodFactor;
 
       const water =
-        route.consumption
-          .waterLitersPerPersonDay *
+        (
+          route.consumption
+            .waterLitersPerPersonDay *
           living *
-          mode.consumptionFactor *
           WATER_POLICIES[
             run.policies.water
           ].waterFactor +
-        transportType
-          .animalWaterLitersPerDay *
-          run.transport.count;
+          transportType
+            .animalWaterLitersPerDay *
+          run.transport.count
+        ) *
+        consumptionPressure;
 
       const fodder =
         run.transport
           .fodderKgPerDay *
-        mode.consumptionFactor;
+        consumptionPressure;
 
       const fuel =
         route.consumption
           .fuelKgPerPartyDay *
-        mode.consumptionFactor;
+        consumptionPressure;
 
       return {
         foodKg:
@@ -32334,6 +32481,484 @@
         dailyNeeds: needs
       };
     }
+
+
+    function highestAdvisoryCondition(
+      run
+    ) {
+      let highest = null;
+
+      for (
+        const member of
+        aliveMembers(run)
+      ) {
+        for (
+          const state of
+          member.conditions || []
+        ) {
+          const definition =
+            content.get(
+              "conditions",
+              state.id
+            );
+
+          if (
+            !definition ||
+            [
+              "fatigue",
+              "nutrition",
+              "hydration",
+              "morale"
+            ].includes(
+              definition.category
+            )
+          ) {
+            continue;
+          }
+
+          if (
+            !highest ||
+            definition.severity >
+              highest.definition
+                .severity
+          ) {
+            highest = {
+              member,
+              state,
+              definition
+            };
+          }
+        }
+      }
+
+      return highest;
+    }
+
+    function assessJourneyRisk(
+      run
+    ) {
+      requireRun(run);
+
+      const mode =
+        selectedMode(run);
+
+      const learningMode =
+        mode.id ===
+        "learning";
+
+      const supplies =
+        supplyForecast(run);
+
+      const load =
+        transportLoadState(run);
+
+      const averageFatigue =
+        averageMemberValue(
+          run,
+          "fatigue",
+          0
+        );
+
+      const durabilityRatio =
+        run.transport
+          .maximumDurability > 0
+          ? run.transport
+              .durability /
+            run.transport
+              .maximumDurability
+          : 0;
+
+      const animalCondition =
+        run.transport
+          .animalCount > 0
+          ? Number(
+              run.transport
+                .animalCondition
+            )
+          : null;
+
+      const condition =
+        highestAdvisoryCondition(
+          run
+        );
+
+      const criticalMember =
+        aliveMembers(run)
+          .slice()
+          .sort(
+            (first, second) =>
+              first.health -
+              second.health
+          )[0] || null;
+
+      const tokens =
+        Number(
+          run.flags &&
+          run.flags
+            .emergencyRecoveryTokens
+        ) || 0;
+
+      const recoveryUses =
+        Math.max(
+          0,
+          Math.trunc(
+            Number(
+              run.flags &&
+              run.flags
+                .emergencyRecoveryUses
+            ) || 0
+          )
+        );
+
+      const waterHardLock =
+        supplies.waterDays !==
+          null &&
+        supplies.waterDays <
+          0.2;
+
+      const foodHardLock =
+        supplies.foodDays !==
+          null &&
+        supplies.foodDays <
+          0.5;
+
+      const transportHardLock =
+        Boolean(
+          run.flags &&
+          run.flags
+            .transportDisabled
+        ) ||
+        durabilityRatio <= 0.02 ||
+        (
+          animalCondition !==
+            null &&
+          animalCondition <= 5
+        );
+
+      const partyHardLock =
+        Boolean(
+          criticalMember &&
+          criticalMember.health <=
+            10
+        );
+
+      const assistanceAvailable =
+        ![
+          "completed",
+          "failed",
+          "abandoned"
+        ].includes(
+          run.status
+        ) &&
+        (
+          transportHardLock ||
+          waterHardLock ||
+          foodHardLock ||
+          partyHardLock
+        );
+
+      const issues = [];
+
+      function addIssue(
+        code,
+        message,
+        action,
+        actionLabel,
+        options = {}
+      ) {
+        issues.push({
+          code,
+          message,
+          action,
+          actionLabel,
+          blocking:
+            options.blocking !==
+            false,
+          tone:
+            options.tone ||
+            "warning",
+          value:
+            options.value ??
+            null
+        });
+      }
+
+      if (assistanceAvailable) {
+        addIssue(
+          "emergency-recovery-available",
+          "The expedition has reached an otherwise irrecoverable state. " +
+            "A score-penalized emergency recovery is available and may be used whenever a hard lock recurs.",
+          "journey.learning-assist",
+          "Use emergency recovery",
+          {
+            tone: "danger"
+          }
+        );
+      }
+
+      if (
+        supplies.waterDays !==
+          null &&
+        supplies.waterDays <
+          LEARNING_ASSIST
+            .waterGuardDays
+      ) {
+        addIssue(
+          "water-critical",
+          `Only ${util.roundTo(supplies.waterDays, 1)} estimated days of ` +
+            "carried water remain. Seek water before continuing.",
+          "journey.provision-dialog",
+          "Seek water",
+          {
+            tone: "danger",
+            value:
+              supplies.waterDays
+          }
+        );
+      }
+
+      if (
+        supplies.foodDays !==
+          null &&
+        supplies.foodDays <
+          LEARNING_ASSIST
+            .foodGuardDays
+      ) {
+        addIssue(
+          "food-critical",
+          `Only ${util.roundTo(supplies.foodDays, 1)} estimated days of ` +
+            "food remain. Provision or trade before continuing.",
+          "journey.provision-dialog",
+          "Seek food",
+          {
+            tone: "danger",
+            value:
+              supplies.foodDays
+          }
+        );
+      }
+
+      if (
+        criticalMember &&
+        criticalMember.health <=
+          LEARNING_ASSIST
+            .criticalHealthGuard
+      ) {
+        const hasCondition =
+          Array.isArray(
+            criticalMember.conditions
+          ) &&
+          criticalMember.conditions
+            .length > 0;
+
+        addIssue(
+          "traveler-health-low",
+          `${criticalMember.name} is at ${Math.round(criticalMember.health)}% health. ` +
+            "Treat the condition or rest before committing to more travel.",
+          hasCondition
+            ? "journey.treat-dialog"
+            : "journey.rest-dialog",
+          hasCondition
+            ? "Treat the traveler"
+            : "Rest the party",
+          {
+            tone:
+              criticalMember.health <=
+                20
+                ? "danger"
+                : "warning",
+            value:
+              criticalMember.health
+          }
+        );
+      }
+
+      if (
+        averageFatigue >=
+        LEARNING_ASSIST
+          .fatigueGuard
+      ) {
+        addIssue(
+          "fatigue-high",
+          `Average fatigue is ${Math.round(averageFatigue)}%. ` +
+            "The safe travel policy rests before continuing from this point.",
+          "journey.rest-dialog",
+          "Rest the party",
+          {
+            tone:
+              averageFatigue >= 75
+                ? "danger"
+                : "warning",
+            value:
+              averageFatigue
+          }
+        );
+      }
+
+      if (
+        condition &&
+        condition.definition
+          .severity >=
+          LEARNING_ASSIST
+            .conditionGuardSeverity
+      ) {
+        addIssue(
+          "condition-needs-treatment",
+          `${condition.member.name} has ${condition.definition.name}. ` +
+            "Treat serious conditions before another multi-day travel action.",
+          "journey.treat-dialog",
+          "Treat a traveler",
+          {
+            tone:
+              condition.definition
+                .severity >= 3
+                ? "danger"
+                : "warning",
+            value:
+              condition.definition
+                .severity
+          }
+        );
+      }
+
+      if (
+        durabilityRatio <=
+        LEARNING_ASSIST
+          .durabilityGuardRatio
+      ) {
+        addIssue(
+          "transport-worn",
+          `Transport condition is ${Math.round(durabilityRatio * 100)}%. ` +
+            "Repair before accumulated wear becomes a breakdown.",
+          "journey.repair-dialog",
+          "Repair transport",
+          {
+            tone:
+              durabilityRatio <=
+                0.2
+                ? "danger"
+                : "warning",
+            value:
+              durabilityRatio
+          }
+        );
+      }
+
+      if (
+        animalCondition !==
+          null &&
+        animalCondition <=
+          LEARNING_ASSIST
+            .animalGuardCondition
+      ) {
+        addIssue(
+          "animals-strained",
+          `Transport animal condition is ${Math.round(animalCondition)}%. ` +
+            "Rest or use animal care before continuing.",
+          "journey.rest-dialog",
+          "Rest the animals",
+          {
+            tone:
+              animalCondition <= 12
+                ? "danger"
+                : "warning",
+            value:
+              animalCondition
+          }
+        );
+      }
+
+      if (
+        run.transport
+          .animalCount > 0 &&
+        supplies.fodderDays !==
+          null &&
+        supplies.fodderDays <
+          LEARNING_ASSIST
+            .fodderGuardDays
+      ) {
+        addIssue(
+          "fodder-low",
+          `Only ${util.roundTo(supplies.fodderDays, 1)} estimated days of ` +
+            "carried fodder remain.",
+          "journey.provision-dialog",
+          "Seek fodder",
+          {
+            tone: "warning",
+            value:
+              supplies.fodderDays
+          }
+        );
+      }
+
+      if (
+        load.ratio > 1.15
+      ) {
+        addIssue(
+          "load-heavy",
+          `The expedition is at ${Math.round(load.ratio * 100)}% of effective ` +
+            "capacity. Reduce cargo when practical.",
+          "nav.inventory",
+          "Review inventory",
+          {
+            blocking: false,
+            tone:
+              load.ratio >
+                1.3
+                ? "danger"
+                : "warning",
+            value:
+              load.ratio
+          }
+        );
+      }
+
+      const primary =
+        issues[0] ||
+        null;
+
+      return {
+        learningMode,
+        thresholds:
+          LEARNING_ASSIST,
+        averageFatigue:
+          util.roundTo(
+            averageFatigue,
+            2
+          ),
+        durabilityRatio:
+          util.roundTo(
+            durabilityRatio,
+            4
+          ),
+        animalCondition,
+        supplies,
+        load,
+        assistanceAvailable,
+        recoveryUses,
+        legacyRecoveryTokens:
+          tokens,
+        rescueTokens:
+          1,
+        issues,
+        primary,
+        shouldStopTravel:
+          run.status ===
+            "traveling" &&
+          issues.some(
+            (entry) =>
+              entry.blocking
+          )
+      };
+    }
+
+    const JourneyAdvisor =
+      Object.freeze({
+        assess:
+          assessJourneyRisk,
+        thresholds:
+          LEARNING_ASSIST
+      });
 
     function runSummary(run) {
       const route =
@@ -32454,6 +33079,8 @@
           transportLoadState,
         waterCapacity:
           effectiveWaterCapacity,
+        advisor:
+          assessJourneyRisk,
         summary:
           runSummary
       });
@@ -33676,6 +34303,13 @@
               .patchVersion,
           learningRescueTokens:
             mode.rescueTokens,
+          emergencyRecoveryTokens:
+            LEARNING_ASSIST
+              .emergencyRecoveryTokens,
+          emergencyRecoveryUses:
+            0,
+          emergencyRecoveryUsed:
+            false,
           departed: false,
           arrivalProcessed: false,
           gameOverProcessed: false
@@ -33987,6 +34621,38 @@
       const changes = [];
 
       if (
+        !Number.isFinite(
+          Number(
+            run.flags
+              .emergencyRecoveryTokens
+          )
+        )
+      ) {
+        run.flags
+          .emergencyRecoveryTokens =
+          run.flags
+            .emergencyRecoveryUsed
+            ? 0
+            : LEARNING_ASSIST
+                .emergencyRecoveryTokens;
+
+        run.flags
+          .emergencyRecoveryUsed =
+          Boolean(
+            run.flags
+              .emergencyRecoveryUsed
+          );
+
+        changes.push({
+          type:
+            "emergency-recovery-token",
+          quantity:
+            run.flags
+              .emergencyRecoveryTokens
+        });
+      }
+
+      if (
         run.status ===
           "outfitting" &&
         !run.flags.departed
@@ -34190,6 +34856,10 @@
       Object.freeze({
         RUN_SCHEMA_VERSION,
         JOURNEY_BALANCE,
+        LEARNING_ASSIST,
+        HUMAN_PRESSURE,
+        pressure:
+          HumanPressure,
         RUN_STATUSES,
         RUN_PHASES,
         PACE_POLICIES,
@@ -34205,6 +34875,8 @@
         NPC: NpcModel,
         selectors:
           RunSelectors,
+        advisor:
+          JourneyAdvisor,
         factory:
           RunFactory,
         validate:
@@ -34220,6 +34892,12 @@
         writable: false,
         enumerable: true
       },
+      humanPressure: {
+        value:
+          HumanPressure,
+        writable: false,
+        enumerable: true
+      },
       runModel: {
         value: runModel,
         writable: false,
@@ -34232,6 +34910,11 @@
       },
       runSelectors: {
         value: RunSelectors,
+        writable: false,
+        enumerable: true
+      },
+      journeyAdvisor: {
+        value: JourneyAdvisor,
         writable: false,
         enumerable: true
       }
@@ -34793,7 +35476,37 @@
     } = runModel;
 
     const STARTING_FUNDS_BALANCE_VERSION =
-      "TRAIL_ATLAS_STARTING_FUNDS_PATCH_V11";
+      "TRAIL_ATLAS_SOLVENCY_AND_LOGISTICS_PATCH_V16";
+
+    /*
+     * TRAIL_ATLAS_SOLVENCY_AND_LOGISTICS_PATCH_V16
+     *
+     * Starting funds must cover the modeled route rather than merely match
+     * between screens. Recommended purchases must remain below physical
+     * transport capacity, and water planning must use refill intervals rather
+     * than treating every mile before the next market as one dry interval.
+     */
+    const SOLVENCY_MARGIN_FACTORS =
+      Object.freeze({
+        learning: 0.75,
+        standard: 0.50,
+        expedition: 0.30
+      });
+
+    const SAFE_RECOMMENDED_LOAD_RATIO =
+      0.95;
+
+    const GUARANTEED_WATER_ACCESS_THRESHOLD =
+      0.25;
+
+    const WATER_SOURCE_GAP_SPAN_DAYS =
+      5;
+
+    const WATER_DELAY_RESERVE_DAYS =
+      2;
+
+    const WATER_PLANNING_SAFETY_FACTOR =
+      1.25;
 
     const CONTROLLED_ROUTE_TYPES = new Set([
       "imperial-road-network",
@@ -35222,6 +35935,42 @@
       );
     }
 
+    function milestoneProvidesCommercialWater(
+      milestone
+    ) {
+      if (!milestone) {
+        return false;
+      }
+
+      if (
+        milestone.marketProfileId
+      ) {
+        return true;
+      }
+
+      return (
+        Array.isArray(
+          milestone.services
+        ) &&
+        milestone.services.includes(
+          "market"
+        )
+      );
+    }
+
+    function milestoneProvidesWaterResupply(
+      milestone
+    ) {
+      return (
+        milestoneProvidesDependableWater(
+          milestone
+        ) ||
+        milestoneProvidesCommercialWater(
+          milestone
+        )
+      );
+    }
+
     function adjustedWaterNeedForSegment(
       run,
       segment,
@@ -35254,6 +36003,12 @@
           segment.terrainId
         );
 
+      const consumptionPressure =
+        runModel.pressure.factor(
+          run,
+          "consumption"
+        );
+
       const animalBaseline =
         Math.max(
           0,
@@ -35261,7 +36016,8 @@
             run.transport
               .animalWaterLitersPerDay
           ) || 0
-        );
+        ) *
+        consumptionPressure;
 
       /*
        * Camel water endurance is represented as a reduction in water that
@@ -35305,6 +36061,408 @@
       };
     }
 
+    function segmentWaterCarryPlan(
+      run,
+      segment,
+      suppliedNeeds = null
+    ) {
+      const route =
+        selectors.route(run);
+
+      const planning =
+        selectors.segmentPlanning(
+          run,
+          segment
+        );
+
+      const needs =
+        suppliedNeeds ||
+        selectors.dailyNeeds(
+          run
+        );
+
+      const adjusted =
+        adjustedWaterNeedForSegment(
+          run,
+          segment,
+          needs
+        );
+
+      const waterAccess =
+        util.clamp(
+          Number(
+            segment.waterAccess
+          ) || 0,
+          0,
+          1
+        );
+
+      const minimumReserveDays =
+        Math.max(
+          1,
+          Number(
+            route.consumption
+              .minimumWaterReserveDays
+          ) || 1
+        );
+
+      const accessGapDays =
+        Math.max(
+          minimumReserveDays,
+          1 +
+          Math.ceil(
+            (
+              1 -
+              waterAccess
+            ) *
+            WATER_SOURCE_GAP_SPAN_DAYS
+          )
+        );
+
+      const periodicSources =
+        waterAccess >=
+          GUARANTEED_WATER_ACCESS_THRESHOLD &&
+        planning.movementDays >
+          accessGapDays;
+
+      const dryMovementDays =
+        periodicSources
+          ? Math.min(
+              planning.movementDays,
+              accessGapDays
+            )
+          : planning.movementDays;
+
+      /*
+       * Preserve the existing daily environmental-water contribution. The
+       * V16 correction adds bounded refill opportunities instead of allowing
+       * the carried reserve to drain forever.
+       */
+      const carriedDailyLiters =
+        adjusted.totalLiters *
+        (
+          1 -
+          waterAccess
+        );
+
+      const weatherAdjustedDailyLiters =
+        carriedDailyLiters *
+        WATER_PLANNING_SAFETY_FACTOR;
+
+      const requiredLiters =
+        weatherAdjustedDailyLiters *
+        (
+          dryMovementDays +
+          WATER_DELAY_RESERVE_DAYS
+        );
+
+      const destination =
+        content
+          .getRouteIndex(
+            run.routeId
+          )
+          .getMilestone(
+            segment.to
+          );
+
+      return {
+        segmentId:
+          segment.id,
+        movementDays:
+          util.roundTo(
+            planning.movementDays,
+            5
+          ),
+        waterAccess:
+          util.roundTo(
+            waterAccess,
+            5
+          ),
+        periodicSources,
+        sourceAtEnd:
+          periodicSources ||
+          milestoneProvidesWaterResupply(
+            destination
+          ),
+        sourceIntervalDays:
+          periodicSources
+            ? Math.max(
+                1,
+                Math.ceil(
+                  dryMovementDays
+                )
+              )
+            : null,
+        dryMovementDays:
+          util.roundTo(
+            dryMovementDays,
+            5
+          ),
+        delayReserveDays:
+          WATER_DELAY_RESERVE_DAYS,
+        carriedDailyLiters:
+          util.roundTo(
+            carriedDailyLiters,
+            5
+          ),
+        weatherAdjustedDailyLiters:
+          util.roundTo(
+            weatherAdjustedDailyLiters,
+            5
+          ),
+        requiredLiters:
+          util.roundTo(
+            Math.max(
+              0,
+              requiredLiters
+            ),
+            2
+          ),
+        adjustedWater:
+          adjusted
+      };
+    }
+
+    function addRouteWaterToTarget(
+      run,
+      targetLiters,
+      source,
+      metadata = {}
+    ) {
+      const carried =
+        Inventory.quantity(
+          run.inventory,
+          "water"
+        );
+
+      const waterCapacity =
+        Transport.waterCapacity(
+          run
+        );
+
+      const load =
+        Transport.loadState(
+          run
+        );
+
+      const waterSpace =
+        Math.max(
+          0,
+          waterCapacity -
+          carried
+        );
+
+      const cargoSpace =
+        Math.max(
+          0,
+          load.capacityKg -
+          load.weightKg
+        );
+
+      const needed =
+        Math.max(
+          0,
+          Number(
+            targetLiters
+          ) -
+          carried
+        );
+
+      const quantity =
+        util.roundTo(
+          Math.max(
+            0,
+            Math.min(
+              needed,
+              waterSpace,
+              cargoSpace
+            )
+          ),
+          2
+        );
+
+      if (quantity <= 0.01) {
+        return {
+          available: true,
+          added: 0,
+          targetLiters:
+            util.roundTo(
+              Math.max(
+                0,
+                Number(
+                  targetLiters
+                ) || 0
+              ),
+              2
+            ),
+          carriedLiters:
+            carried,
+          source
+        };
+      }
+
+      Inventory.add(
+        run.inventory,
+        "water",
+        quantity,
+        {
+          source,
+          acquiredDay:
+            run.calendar.dayIndex,
+          unitCost: 0,
+          quality: 92,
+          metadata: {
+            dependableRouteSource:
+              true,
+            ...metadata
+          }
+        }
+      );
+
+      return {
+        available: true,
+        added: quantity,
+        targetLiters:
+          util.roundTo(
+            targetLiters,
+            2
+          ),
+        carriedLiters:
+          util.roundTo(
+            carried + quantity,
+            2
+          ),
+        source
+      };
+    }
+
+    function nextWaterCarryTarget(
+      run,
+      milestoneId =
+        run.progress
+          .currentMilestoneId
+    ) {
+      const outgoing =
+        content
+          .getRouteIndex(
+            run.routeId
+          )
+          .outgoing(
+            milestoneId
+          );
+
+      if (!outgoing.length) {
+        return 0;
+      }
+
+      return Math.max(
+        ...outgoing.map(
+          (segment) =>
+            segmentWaterCarryPlan(
+              run,
+              segment
+            ).requiredLiters
+        )
+      );
+    }
+
+    function refillWaterOnTravelDay(
+      run,
+      segment,
+      segmentTravelDays
+    ) {
+      const plan =
+        segmentWaterCarryPlan(
+          run,
+          segment
+        );
+
+      if (
+        !plan.periodicSources ||
+        !plan.sourceIntervalDays ||
+        segmentTravelDays <= 0 ||
+        segmentTravelDays %
+          plan.sourceIntervalDays !==
+          0
+      ) {
+        return {
+          available: false,
+          added: 0,
+          segmentId:
+            segment.id,
+          segmentTravelDays
+        };
+      }
+
+      return {
+        ...addRouteWaterToTarget(
+          run,
+          plan.requiredLiters,
+          `route-source:${segment.id}:${segmentTravelDays}`,
+          {
+            segmentId:
+              segment.id,
+            segmentTravelDays
+          }
+        ),
+        segmentId:
+          segment.id,
+        segmentTravelDays
+      };
+    }
+
+    function refillWaterAfterSegment(
+      run,
+      segment,
+      milestone
+    ) {
+      const plan =
+        segmentWaterCarryPlan(
+          run,
+          segment
+        );
+
+      const naturalSource =
+        milestoneProvidesDependableWater(
+          milestone
+        ) ||
+        plan.periodicSources;
+
+      if (!naturalSource) {
+        return {
+          available: false,
+          added: 0,
+          milestoneId:
+            milestone
+              ? milestone.id
+              : null,
+          segmentId:
+            segment.id
+        };
+      }
+
+      return {
+        ...addRouteWaterToTarget(
+          run,
+          nextWaterCarryTarget(
+            run,
+            milestone.id
+          ),
+          `route-source:${milestone.id}`,
+          {
+            milestoneId:
+              milestone.id,
+            completedSegmentId:
+              segment.id
+          }
+        ),
+        milestoneId:
+          milestone.id,
+        segmentId:
+          segment.id
+      };
+    }
+
     function segmentReservePlan(
       run,
       segments
@@ -35324,13 +36482,23 @@
 
       let foodKg = 0;
       let fodderKg = 0;
-      let currentWaterLiters = 0;
+
+      /*
+       * initialWaterLiters is the amount that must be loaded at the beginning
+       * of this path. maximumWaterLiters is the largest container requirement
+       * at any later refill. They are intentionally separate.
+       */
+      let initialWaterLiters = 0;
       let maximumWaterLiters = 0;
+      let currentWaterLiters = 0;
+      let beforeFirstWaterResupply = true;
       let totalWaterConsumptionLiters = 0;
+
       let movementDays = 0;
       let restDays = 0;
       let contingencyDays = 0;
       let serviceDays = 0;
+
       let maximumDailyCarriedWater = 0;
       let maximumDailyCarriedFodder = 0;
 
@@ -35363,13 +36531,9 @@
             Number(
               segment.serviceGapDays
             ) ||
-              segmentMovementDays
+            segmentMovementDays
           );
 
-        /*
-         * serviceGapDays describes the maximum represented movement interval
-         * between minor sources, stops, grazing opportunities, or assistance.
-         */
         const representedServiceDays =
           Math.min(
             segmentMovementDays,
@@ -35384,21 +36548,15 @@
             1
           );
 
-        const adjustedWater =
-          adjustedWaterNeedForSegment(
+        const waterPlan =
+          segmentWaterCarryPlan(
             run,
             segment,
             needs
           );
 
         const waterAccess =
-          util.clamp(
-            Number(
-              segment.waterAccess
-            ) || 0,
-            0,
-            1
-          );
+          waterPlan.waterAccess;
 
         const grazingFactor =
           util.clamp(
@@ -35407,43 +36565,72 @@
                 segment.forage
               ) || 0
             ) *
-              route.consumption
-                .grazingOffsetFactor,
+            route.consumption
+              .grazingOffsetFactor,
             0,
             0.92
           );
 
-        /*
-         * Movement days receive the compressed-route source credit. Recovery
-         * and delay days do not receive that credit, but they still retain the
-         * segment's direct environmental water and grazing availability.
-         */
         const movementWaterLiters =
-          adjustedWater.totalLiters *
-          (
-            1 -
-            waterAccess
-          ) *
-          representedServiceDays;
+          waterPlan
+            .weatherAdjustedDailyLiters *
+          waterPlan
+            .dryMovementDays;
 
         const stationaryWaterLiters =
-          adjustedWater.totalLiters *
-          (
-            1 -
-            waterAccess
-          ) *
-          segmentStationaryDays;
+          waterPlan
+            .weatherAdjustedDailyLiters *
+          waterPlan
+            .delayReserveDays;
 
         const segmentWaterLiters =
-          movementWaterLiters +
-          stationaryWaterLiters;
+          waterPlan.requiredLiters;
 
-        const dailyCarriedWater =
-          adjustedWater.totalLiters *
-          (
-            1 -
-            waterAccess
+        currentWaterLiters +=
+          segmentWaterLiters;
+
+        maximumWaterLiters =
+          Math.max(
+            maximumWaterLiters,
+            currentWaterLiters
           );
+
+        if (
+          beforeFirstWaterResupply
+        ) {
+          initialWaterLiters =
+            Math.max(
+              initialWaterLiters,
+              currentWaterLiters
+            );
+        }
+
+        totalWaterConsumptionLiters +=
+          segmentWaterLiters;
+
+        maximumDailyCarriedWater =
+          Math.max(
+            maximumDailyCarriedWater,
+            waterPlan
+              .weatherAdjustedDailyLiters
+          );
+
+        const destination =
+          index.getMilestone(
+            segment.to
+          );
+
+        const waterResupplyAtEnd =
+          waterPlan.sourceAtEnd ||
+          milestoneProvidesWaterResupply(
+            destination
+          );
+
+        if (waterResupplyAtEnd) {
+          currentWaterLiters = 0;
+          beforeFirstWaterResupply =
+            false;
+        }
 
         const movementFodderKg =
           needs.fodderKg *
@@ -35480,43 +36667,6 @@
           needs.foodKg *
           segmentCalendarDays;
 
-        currentWaterLiters +=
-          segmentWaterLiters;
-
-        maximumWaterLiters =
-          Math.max(
-            maximumWaterLiters,
-            currentWaterLiters
-          );
-
-        totalWaterConsumptionLiters +=
-          segmentWaterLiters;
-
-        maximumDailyCarriedWater =
-          Math.max(
-            maximumDailyCarriedWater,
-            dailyCarriedWater
-          );
-
-        maximumDailyCarriedFodder =
-          Math.max(
-            maximumDailyCarriedFodder,
-            dailyCarriedFodder
-          );
-
-        const destination =
-          index.getMilestone(
-            segment.to
-          );
-
-        if (
-          milestoneProvidesDependableWater(
-            destination
-          )
-        ) {
-          currentWaterLiters = 0;
-        }
-
         foodKg +=
           segmentFoodKg;
 
@@ -35534,6 +36684,12 @@
 
         serviceDays +=
           representedServiceDays;
+
+        maximumDailyCarriedFodder =
+          Math.max(
+            maximumDailyCarriedFodder,
+            dailyCarriedFodder
+          );
 
         details.push({
           segmentId:
@@ -35589,6 +36745,10 @@
               grazingFactor,
               4
             ),
+          waterSourcePlan:
+            util.deepClone(
+              waterPlan
+            ),
           movementWaterLiters:
             util.roundTo(
               movementWaterLiters,
@@ -35614,9 +36774,28 @@
               segmentFoodKg,
               2
             ),
-          adjustedWater
+          adjustedWater:
+            waterPlan
+              .adjustedWater
         });
       }
+
+      if (
+        beforeFirstWaterResupply
+      ) {
+        initialWaterLiters =
+          Math.max(
+            initialWaterLiters,
+            currentWaterLiters
+          );
+      }
+
+      maximumWaterLiters =
+        Math.max(
+          maximumWaterLiters,
+          currentWaterLiters,
+          initialWaterLiters
+        );
 
       const dryStageReserveDays =
         details.length
@@ -35625,15 +36804,6 @@
               .dryStageStationaryReserveDays
           : 0;
 
-      /*
-       * One full stationary day is reserved at the driest represented point.
-       * This covers a forced wait, crossing interruption, short illness, or
-       * repair without pretending that stationary days retain movement credit.
-       */
-      const dryStageWaterReserve =
-        maximumDailyCarriedWater *
-        dryStageReserveDays;
-
       const dryStageFodderReserve =
         maximumDailyCarriedFodder *
         dryStageReserveDays;
@@ -35641,16 +36811,6 @@
       const dryStageFoodReserve =
         needs.foodKg *
         dryStageReserveDays;
-
-      maximumWaterLiters =
-        Math.max(
-          maximumWaterLiters,
-          currentWaterLiters
-        ) +
-        dryStageWaterReserve;
-
-      totalWaterConsumptionLiters +=
-        dryStageWaterReserve;
 
       foodKg +=
         dryStageFoodReserve;
@@ -35668,23 +36828,31 @@
         foodKg:
           util.roundTo(
             foodKg *
-              runModel
-                .JOURNEY_BALANCE
-                .supplyReserveFactor,
+            runModel
+              .JOURNEY_BALANCE
+              .supplyReserveFactor,
             2
           ),
+
+        /*
+         * Water to load now versus maximum future container capacity.
+         */
         waterLiters:
           util.roundTo(
-            maximumWaterLiters *
-              1.05,
+            initialWaterLiters,
+            2
+          ),
+        waterCapacityLiters:
+          util.roundTo(
+            maximumWaterLiters,
             2
           ),
         waterConsumptionLiters:
           util.roundTo(
-            totalWaterConsumptionLiters *
-              1.05,
+            totalWaterConsumptionLiters,
             2
           ),
+
         fodderKg:
           util.roundTo(
             fodderKg * 1.05,
@@ -35708,7 +36876,7 @@
         contingencyDays:
           util.roundTo(
             contingencyDays +
-              dryStageReserveDays,
+            dryStageReserveDays,
             2
           ),
         calendarDays:
@@ -35721,11 +36889,15 @@
             serviceDays,
             2
           ),
+        maximumDailyCarriedWater:
+          util.roundTo(
+            maximumDailyCarriedWater,
+            2
+          ),
         dryStageReserveDays,
         details
       };
     }
-
 
     function pathsToNextMarkets(
       run,
@@ -35870,6 +37042,7 @@
         return {
           foodKg: 0,
           waterLiters: 0,
+          waterCapacityLiters: 0,
           waterConsumptionLiters: 0,
           fodderKg: 0,
           movementDays: 0,
@@ -35901,6 +37074,10 @@
         waterLiters:
           maximum(
             "waterLiters"
+          ),
+        waterCapacityLiters:
+          maximum(
+            "waterCapacityLiters"
           ),
         waterConsumptionLiters:
           maximum(
@@ -35938,7 +37115,6 @@
       };
     }
 
-
     function waterContainerCapacityLiters() {
       const item =
         content.require(
@@ -35966,14 +37142,17 @@
           milestoneId
         );
 
+      /*
+       * TRAIL_ATLAS_V16_ESSENTIAL_STOCK_AND_SMOKE_HOTFIX
+       *
+       * The recommendation is specifically a durable staple reserve.
+       * Perishable fresh food must not reduce the market's guaranteed
+       * staple-food stock.
+       */
       const currentFood =
         Inventory.quantity(
           run.inventory,
           "staple-food"
-        ) +
-        Inventory.quantity(
-          run.inventory,
-          "fresh-food"
         );
 
       const currentWater =
@@ -36018,7 +37197,10 @@
             Math.ceil(
               Math.max(
                 0,
-                plan.waterLiters -
+                (
+                  plan.waterCapacityLiters ||
+                  plan.waterLiters
+                ) -
                   currentWaterCapacity
               ) /
                 waterContainerCapacityLiters()
@@ -36046,104 +37228,52 @@
         };
       }
 
-      const waterCapacity =
-        Transport.waterCapacity(
-          run
-        );
-
-      const carriedWater =
-        Inventory.quantity(
-          run.inventory,
-          "water"
-        );
-
-      const load =
-        Transport.loadState(
-          run
-        );
-
-      const waterSpace =
-        Math.max(
-          0,
-          waterCapacity -
-            carriedWater
-        );
-
-      const cargoSpace =
-        Math.max(
-          0,
-          load.capacityKg -
-            load.weightKg
-        );
-
-      const quantity =
-        util.roundTo(
-          Math.max(
-            0,
-            Math.min(
-              waterSpace,
-              cargoSpace
-            )
-          ),
-          2
-        );
-
-      if (quantity <= 0.01) {
-        return {
-          available: true,
-          added: 0,
-          milestoneId:
+      const result =
+        addRouteWaterToTarget(
+          run,
+          nextWaterCarryTarget(
+            run,
             milestone.id
-        };
-      }
-
-      Inventory.add(
-        run.inventory,
-        "water",
-        quantity,
-        {
-          source:
-            `water-source:${milestone.id}`,
-          acquiredDay:
-            run.calendar.dayIndex,
-          unitCost: 0,
-          quality: 92,
-          metadata: {
-            dependableRouteSource:
-              true,
+          ),
+          `water-source:${milestone.id}`,
+          {
             milestoneId:
               milestone.id
           }
-        }
-      );
+        );
 
-      Journal.add(
-        run,
-        {
-          type:
-            "water-refill",
-          title:
-            `Refilled Water at ${milestone.name}`,
-          text:
-            `The party refilled ${util.roundTo(quantity, 1)} liters from a dependable route source.`,
-          tone: "positive",
-          key: false,
-          tags: [
-            "water",
-            "resupply",
-            milestone.id
-          ],
-          data: {
-            milestoneId:
-              milestone.id,
-            quantity
+      if (result.added > 0.01) {
+        Journal.add(
+          run,
+          {
+            type:
+              "water-refill",
+            title:
+              `Refilled Water at ${milestone.name}`,
+            text:
+              `The party refilled ${util.roundTo(result.added, 1)} liters from a dependable route source.`,
+            tone: "positive",
+            key: false,
+            tags: [
+              "water",
+              "resupply",
+              milestone.id
+            ],
+            data: {
+              milestoneId:
+                milestone.id,
+              quantity:
+                result.added,
+              targetLiters:
+                result
+                  .targetLiters
+            }
           }
-        }
-      );
+        );
+      }
 
       return {
-        available: true,
-        added: quantity,
+        ...result,
         milestoneId:
           milestone.id
       };
@@ -36155,49 +37285,96 @@
     ) {
       const route =
         selectors.route(run);
+
       const index =
         content.getRouteIndex(
           route.id
         );
 
-      const declared =
-        route.briefing
-          .roadAhead || [];
+      const startMilestoneId =
+        run.progress &&
+        run.progress
+          .currentMilestoneId
+          ? run.progress
+              .currentMilestoneId
+          : route
+              .startMilestoneId;
 
       const segments = [];
+      const queue = [
+        startMilestoneId
+      ];
+      const visitedMilestones =
+        new Set([
+          startMilestoneId
+        ]);
+      const visitedSegments =
+        new Set();
 
-      for (const report of declared) {
-        const segment =
-          index.getSegment(
-            report.segmentId
+      while (
+        queue.length &&
+        segments.length <
+          maximum
+      ) {
+        const milestoneId =
+          queue.shift();
+
+        const outgoing =
+          index
+            .outgoing(
+              milestoneId
+            )
+            .slice()
+            .sort(
+              (first, second) =>
+                first.distanceKm -
+                  second.distanceKm ||
+                first.id.localeCompare(
+                  second.id
+                )
+            );
+
+        for (
+          const segment of
+          outgoing
+        ) {
+          if (
+            visitedSegments.has(
+              segment.id
+            )
+          ) {
+            continue;
+          }
+
+          visitedSegments.add(
+            segment.id
           );
 
-        if (segment) {
           segments.push(
             segment
           );
-        }
 
-        if (
-          segments.length >=
-          maximum
-        ) {
-          break;
-        }
-      }
+          if (
+            segments.length >=
+            maximum
+          ) {
+            break;
+          }
 
-      if (!segments.length) {
-        segments.push(
-          ...index
-            .outgoing(
-              route
-                .startMilestoneId
+          if (
+            !visitedMilestones.has(
+              segment.to
             )
-            .slice(
-              0,
-              maximum
-            )
-        );
+          ) {
+            visitedMilestones.add(
+              segment.to
+            );
+
+            queue.push(
+              segment.to
+            );
+          }
+        }
       }
 
       return segments;
@@ -36261,6 +37438,351 @@
           options.conditional ||
           null
       };
+    }
+
+    function recommendationCapacityOrder(
+      recommendation
+    ) {
+      const itemOrder = {
+        "pack-gear": 0,
+        "water-container": 1,
+        permit: 2,
+        water: 3,
+        "staple-food": 4,
+        fodder: 5,
+        "tool-kit": 6,
+        "animal-tack": 7,
+        clothing: 8,
+        bedding: 9,
+        footwear: 10,
+        rope: 11,
+        "navigation-kit": 12,
+        medicine: 13,
+        bandages: 14,
+        "sanitation-supplies": 15,
+        "repair-materials": 16
+      };
+
+      const priorityOrder = {
+        essential: 0,
+        recommended: 1,
+        optional: 2
+      };
+
+      return (
+        (
+          priorityOrder[
+            recommendation.priority
+          ] ?? 3
+        ) *
+          100 +
+        (
+          itemOrder[
+            recommendation.itemId
+          ] ?? 50
+        )
+      );
+    }
+
+    function capacitySafeRecommendations(
+      run,
+      recommendations
+    ) {
+      let projectedWeight =
+        Inventory.weight(
+          run.inventory
+        );
+
+      let projectedCapacity =
+        Transport.capacity(
+          run
+        );
+
+      let projectedWater =
+        Inventory.quantity(
+          run.inventory,
+          "water"
+        );
+
+      let projectedWaterCapacity =
+        Transport.waterCapacity(
+          run
+        );
+
+      const planned =
+        recommendations.map(
+          (
+            recommendation,
+            index
+          ) => ({
+            ...recommendation,
+            __index: index
+          })
+        );
+
+      planned.sort(
+        (first, second) =>
+          recommendationCapacityOrder(
+            first
+          ) -
+            recommendationCapacityOrder(
+              second
+            ) ||
+          first.__index -
+            second.__index
+      );
+
+      for (
+        const recommendation of
+        planned
+      ) {
+        const item =
+          content.require(
+            "items",
+            recommendation.itemId
+          );
+
+        const step =
+          quantityStep(
+            item
+          );
+
+        const rawRecommendedQuantity =
+          Math.max(
+            0,
+            Number(
+              recommendation
+                .recommendedQuantity
+            ) || 0
+          );
+
+        const ownedQuantity =
+          Math.max(
+            0,
+            Number(
+              recommendation
+                .ownedQuantity
+            ) || 0
+          );
+
+        const desiredPurchase =
+          Math.max(
+            0,
+            rawRecommendedQuantity -
+              ownedQuantity
+          );
+
+        /*
+         * TRAIL_ATLAS_V16_PURCHASE_STEP_ROUNDING_HOTFIX
+         *
+         * A route requirement must first be rounded UP to a quantity the
+         * store can actually sell. Rounding down and calling the remainder a
+         * capacity failure incorrectly rejected otherwise feasible plans.
+         */
+        const steppedPurchase =
+          step > 0
+            ? Math.ceil(
+                Math.max(
+                  0,
+                  desiredPurchase -
+                    1e-9
+                ) /
+                step
+              ) *
+              step
+            : desiredPurchase;
+
+        const cargoBonusPerUnit =
+          Math.max(
+            0,
+            Number(
+              item.capacity &&
+              item.capacity
+                .cargoKg
+            ) || 0
+          );
+
+        const waterBonusPerUnit =
+          Math.max(
+            0,
+            Number(
+              item.capacity &&
+              item.capacity
+                .waterLiters
+            ) || 0
+          );
+
+        const currentHeadroom =
+          Math.max(
+            0,
+            projectedCapacity *
+              SAFE_RECOMMENDED_LOAD_RATIO -
+              projectedWeight
+          );
+
+        const netLoadPerUnit =
+          item.weightKg -
+          SAFE_RECOMMENDED_LOAD_RATIO *
+            cargoBonusPerUnit;
+
+        let maximumByCargo =
+          steppedPurchase;
+
+        if (
+          netLoadPerUnit > 0
+        ) {
+          maximumByCargo =
+            Math.max(
+              0,
+              currentHeadroom /
+                netLoadPerUnit
+            );
+        }
+
+        let safePurchase =
+          Math.min(
+            steppedPurchase,
+            maximumByCargo
+          );
+
+        if (
+          recommendation.itemId ===
+          "water"
+        ) {
+          safePurchase =
+            Math.min(
+              safePurchase,
+              Math.max(
+                0,
+                projectedWaterCapacity -
+                  projectedWater
+              )
+            );
+        }
+
+        if (step > 0) {
+          safePurchase =
+            Math.floor(
+              (
+                safePurchase +
+                1e-9
+              ) /
+              step
+            ) *
+            step;
+        }
+
+        safePurchase =
+          util.roundTo(
+            Math.max(
+              0,
+              Math.min(
+                steppedPurchase,
+                safePurchase
+              )
+            ),
+            3
+          );
+
+        projectedWeight +=
+          item.weightKg *
+          safePurchase;
+
+        projectedCapacity +=
+          cargoBonusPerUnit *
+          safePurchase;
+
+        projectedWaterCapacity +=
+          waterBonusPerUnit *
+          safePurchase;
+
+        if (
+          recommendation.itemId ===
+          "water"
+        ) {
+          projectedWater +=
+            safePurchase;
+        }
+
+        const deferred =
+          util.roundTo(
+            Math.max(
+              0,
+              desiredPurchase -
+                safePurchase
+            ),
+            3
+          );
+
+        recommendation.rawShortage =
+          util.roundTo(
+            desiredPurchase,
+            3
+          );
+
+        recommendation.stepRoundedPurchase =
+          util.roundTo(
+            steppedPurchase,
+            3
+          );
+
+        recommendation.routeRequiredQuantity =
+          util.roundTo(
+            rawRecommendedQuantity,
+            3
+          );
+
+        recommendation.recommendedQuantity =
+          util.roundTo(
+            ownedQuantity +
+              safePurchase,
+            3
+          );
+
+        recommendation.shortage =
+          safePurchase;
+
+        recommendation.capacityDeferred =
+          deferred;
+
+        recommendation.capacityLimited =
+          deferred > 0.0001;
+
+        recommendation.projectedLoadRatio =
+          projectedCapacity > 0
+            ? util.roundTo(
+                projectedWeight /
+                  projectedCapacity,
+                4
+              )
+            : Infinity;
+
+        if (
+          recommendation.capacityLimited
+        ) {
+          recommendation.reason =
+            `${recommendation.reason} ` +
+            `${deferred} additional units are not recommended in the current load because they would exceed the safe carrying plan.`;
+        }
+      }
+
+      return planned
+        .sort(
+          (first, second) =>
+            first.__index -
+            second.__index
+        )
+        .map(
+          (recommendation) => {
+            const copy = {
+              ...recommendation
+            };
+
+            delete copy.__index;
+
+            return copy;
+          }
+        );
     }
 
     function createRecommendations(
@@ -36458,13 +37980,22 @@
             .fodderKg
         );
 
+      const waterCapacityTarget =
+        Math.max(
+          waterTarget,
+          Number(
+            reservePlan
+              .waterCapacityLiters
+          ) || 0
+        );
+
       const waterContainerTarget =
         Math.max(
           1,
           Math.ceil(
             Math.max(
               0,
-              waterTarget -
+              waterCapacityTarget -
                 run.transport
                   .baseWaterCapacityLiters
             ) /
@@ -36681,7 +38212,10 @@
         );
       }
 
-      return recommendations;
+      return capacitySafeRecommendations(
+        run,
+        recommendations
+      );
     }
 
 
@@ -37067,12 +38601,40 @@
           .baseFunds *
         0.15;
 
-      const minimumJourneyBudget =
+      const modeledJourneyCost =
         currencyRound(
           run,
           recommendationCost +
             continuingConsumablesCost +
             feeReserve
+        );
+
+      const solvencyMarginFactor =
+        Number(
+          SOLVENCY_MARGIN_FACTORS[
+            run.modeId
+          ]
+        ) ||
+        SOLVENCY_MARGIN_FACTORS
+          .standard;
+
+      const solvencyReserve =
+        currencyRound(
+          run,
+          Math.max(
+            modeledJourneyCost *
+              solvencyMarginFactor,
+            route.economy
+              .baseFunds *
+              solvencyMarginFactor
+          )
+        );
+
+      const minimumJourneyBudget =
+        currencyRound(
+          run,
+          modeledJourneyCost +
+            solvencyReserve
         );
 
       return {
@@ -37082,6 +38644,9 @@
           true,
         pathCount:
           pathPlans.length,
+        modeledJourneyCost,
+        solvencyMarginFactor,
+        solvencyReserve,
         recommendationCost:
           currencyRound(
             run,
@@ -37408,6 +38973,15 @@
         .journeyBudgetPlan = {
           professionNeutral:
             true,
+          modeledJourneyCost:
+            budget
+              .modeledJourneyCost,
+          solvencyMarginFactor:
+            budget
+              .solvencyMarginFactor,
+          solvencyReserve:
+            budget
+              .solvencyReserve,
           pathCount:
             budget.pathCount,
           recommendationCost:
@@ -37881,7 +39455,7 @@
       quote,
       options = {}
     ) {
-      requireOutfittingRun(
+      requireRun(
         run
       );
 
@@ -38681,34 +40255,44 @@
           milestone.id
         );
 
-      if (isDeparture) {
-        for (
-          const recommendation of
-          createRecommendations(
-            run
-          )
-        ) {
-          if (
-            [
-              "essential",
+      /*
+       * TRAIL_ATLAS_V16_ESSENTIAL_STOCK_AND_SMOKE_HOTFIX
+       *
+       * Essential route requirements must not disappear merely because the
+       * next dependable market is smaller than the departure outfitter.
+       * Recommended-but-nonessential goods retain the old departure-only
+       * stock guarantee.
+       */
+      for (
+        const recommendation of
+        createRecommendations(
+          run
+        )
+      ) {
+        const guaranteeStock =
+          recommendation.priority ===
+            "essential" ||
+          (
+            isDeparture &&
+            recommendation.priority ===
               "recommended"
-            ].includes(
-              recommendation.priority
-            )
-          ) {
-            stockFloors[
-              recommendation.itemId
-            ] =
-              Math.max(
-                Number(
-                  stockFloors[
-                    recommendation.itemId
-                  ]
-                ) || 0,
+          );
+
+        if (guaranteeStock) {
+          stockFloors[
+            recommendation.itemId
+          ] =
+            Math.max(
+              Number(
+                stockFloors[
+                  recommendation.itemId
+                ]
+              ) || 0,
+              Number(
                 recommendation
                   .shortage
-              );
-          }
+              ) || 0
+            );
         }
       }
 
@@ -39323,18 +40907,19 @@
           : Infinity;
 
       if (
-        loadRatio > 1.3 &&
+        loadRatio > 1.0001 &&
         !options
           .allowExtremeOverload
       ) {
         reasons.push(
-          "Purchase would exceed load limit!"
+          "Purchase would overload the expedition!"
         );
       } else if (
-        loadRatio > 1
+        loadRatio >
+        SAFE_RECOMMENDED_LOAD_RATIO
       ) {
         warnings.push(
-          "Purchase would overload expedition!"
+          "Purchase would exceed the recommended load reserve."
         );
       } else if (
         loadRatio > 0.9
@@ -40167,6 +41752,326 @@
       };
     }
 
+
+    const GUIDED_PURCHASE_ORDER =
+      Object.freeze({
+        "water-container": 0,
+        "pack-gear": 1,
+        permit: 2,
+        "tool-kit": 3,
+        "animal-tack": 4,
+        clothing: 5,
+        bedding: 6,
+        footwear: 7,
+        rope: 8,
+        "navigation-kit": 9,
+        medicine: 10,
+        bandages: 11,
+        "sanitation-supplies": 12,
+        "repair-materials": 13,
+        "staple-food": 20,
+        fodder: 21,
+        water: 30
+      });
+
+    function guidedRecommendationOrder(
+      recommendation
+    ) {
+      const priorityRank = {
+        essential: 0,
+        recommended: 1,
+        optional: 2
+      };
+
+      return (
+        (
+          GUIDED_PURCHASE_ORDER[
+            recommendation.itemId
+          ] ?? 15
+        ) *
+          10 +
+        (
+          priorityRank[
+            recommendation.priority
+          ] ?? 3
+        )
+      );
+    }
+
+    function buyRecommendedPlan(
+      run
+    ) {
+      requireRun(run);
+
+      const visit =
+        requireActiveMarket(
+          run
+        );
+
+      const recommendations =
+        createRecommendations(
+          run
+        )
+          .slice()
+          .sort(
+            (first, second) =>
+              guidedRecommendationOrder(
+                first
+              ) -
+              guidedRecommendationOrder(
+                second
+              )
+          );
+
+      const purchased = [];
+      const skipped = [];
+
+      const fundsBefore =
+        run.economy.funds;
+
+      for (
+        const recommendation of
+        recommendations
+      ) {
+        const itemId =
+          recommendation.itemId;
+
+        const current =
+          Inventory.quantity(
+            run.inventory,
+            itemId
+          );
+
+        let shortage =
+          util.roundTo(
+            Math.max(
+              0,
+              recommendation
+                .recommendedQuantity -
+                current
+            ),
+            3
+          );
+
+        if (shortage <= 0.0001) {
+          continue;
+        }
+
+        const available =
+          Math.max(
+            0,
+            Number(
+              visit.stock[
+                itemId
+              ]
+            ) || 0
+          );
+
+        const quantity =
+          util.roundTo(
+            Math.min(
+              shortage,
+              available
+            ),
+            3
+          );
+
+        if (quantity <= 0.0001) {
+          skipped.push({
+            itemId,
+            priority:
+              recommendation
+                .priority,
+            requested:
+              shortage,
+            purchased: 0,
+            remaining:
+              shortage,
+            reasons: [
+              "No market stock is available."
+            ]
+          });
+
+          continue;
+        }
+
+        const quote =
+          quotePurchase(
+            run,
+            itemId,
+            quantity
+          );
+
+        if (!quote.allowed) {
+          skipped.push({
+            itemId,
+            priority:
+              recommendation
+                .priority,
+            requested:
+              shortage,
+            purchased: 0,
+            remaining:
+              shortage,
+            reasons:
+              quote.reasons
+                .slice()
+          });
+
+          continue;
+        }
+
+        purchaseItem(
+          run,
+          itemId,
+          quantity
+        );
+
+        shortage =
+          util.roundTo(
+            Math.max(
+              0,
+              recommendation
+                .recommendedQuantity -
+                Inventory.quantity(
+                  run.inventory,
+                  itemId
+                )
+            ),
+            3
+          );
+
+        purchased.push({
+          itemId,
+          priority:
+            recommendation
+              .priority,
+          quantity,
+          cost:
+            quote.cost
+        });
+
+        if (shortage > 0.0001) {
+          skipped.push({
+            itemId,
+            priority:
+              recommendation
+                .priority,
+            requested:
+              recommendation
+                .shortage,
+            purchased:
+              quantity,
+            remaining:
+              shortage,
+            reasons: [
+              "The market could supply only part of the recommendation."
+            ]
+          });
+        }
+      }
+
+      if (
+        run.status ===
+          "outfitting" &&
+        purchased.length
+      ) {
+        run.setup
+          .purchasesFinalized =
+          false;
+
+        run.setup
+          .readyToDepart =
+          false;
+
+        run.setup
+          .departureConfirmed =
+          false;
+
+        delete run.setup
+          .departureInventory;
+
+        delete run.setup
+          .departureFunds;
+      }
+
+      const essentialSkipped = [
+        ...skipped.filter(
+          (entry) =>
+            entry.priority ===
+            "essential"
+        ),
+        ...recommendations
+          .filter(
+            (entry) =>
+              entry.priority ===
+                "essential" &&
+              Number(
+                entry.capacityDeferred
+              ) >
+                0.0001
+          )
+          .map(
+            (entry) => ({
+              itemId:
+                entry.itemId,
+              priority:
+                entry.priority,
+              requested:
+                entry.rawShortage ??
+                entry.capacityDeferred,
+              purchased:
+                entry.shortage,
+              remaining:
+                entry.capacityDeferred,
+              reasons: [
+                "The essential route requirement does not fit within the safe carrying plan."
+              ]
+            })
+          )
+      ];
+
+      const result = {
+        visitId:
+          visit.id,
+        purchased,
+        skipped,
+        essentialSkipped,
+        complete:
+          essentialSkipped
+            .length === 0,
+        fundsBefore,
+        fundsAfter:
+          run.economy.funds,
+        spent:
+          currencyRound(
+            run,
+            fundsBefore -
+              run.economy.funds
+          ),
+        load:
+          Transport.loadState(
+            run
+          ),
+        supplies:
+          selectors
+            .supplyForecast(
+              run
+            ),
+        readiness:
+          run.status ===
+            "outfitting"
+            ? assessOutfitting(
+                run
+              )
+            : null
+      };
+
+      touchRun(run);
+
+      return result;
+    }
+
     /* ======================================================================
        04. BRIEFING ACKNOWLEDGEMENT AND OUTFITTING RESET
        ====================================================================== */
@@ -40339,17 +42244,50 @@
       const warnings = [];
       const advice = [];
 
-      if (load.ratio > 1.3) {
+      for (
+        const recommendation of
+        recommendations
+      ) {
+        if (
+          recommendation.priority ===
+            "essential" &&
+          Number(
+            recommendation
+              .capacityDeferred
+          ) >
+            0.0001
+        ) {
+          blockers.push({
+            code:
+              "ESSENTIAL_PLAN_EXCEEDS_CAPACITY",
+            message:
+              `${recommendation.name} still requires ` +
+              `${util.roundTo(recommendation.capacityDeferred, 1)} additional units, ` +
+              "but they do not fit within the safe carrying plan."
+          });
+        } else if (
+          recommendation.priority ===
+            "recommended" &&
+          Number(
+            recommendation
+              .capacityDeferred
+          ) >
+            0.0001
+        ) {
+          advice.push({
+            code:
+              "RECOMMENDATION_CAPACITY_LIMITED",
+            message:
+              `${recommendation.name} was limited by the safe carrying plan.`
+          });
+        }
+      }
+
+      if (load.ratio > 1.0001) {
         blockers.push({
-          code: "EXTREME_OVERLOAD",
-          message:
-            "The expedition exceeds the hard transport-load limit."
-        });
-      } else if (load.ratio > 1) {
-        warnings.push({
           code: "OVERLOADED",
           message:
-            "The expedition is overloaded and will travel slowly with increased wear."
+            "The expedition exceeds its effective transport capacity."
         });
       } else if (
         load.ratio > 0.9
@@ -40827,6 +42765,22 @@
           );
         },
 
+        buyRecommended(
+          store
+        ) {
+          return runStoreCommand(
+            store,
+            "buy-recommended-plan",
+            (run) =>
+              buyRecommendedPlan(
+                run
+              ),
+            {
+              immediate: true
+            }
+          );
+        },
+
         resetOutfitting(
           store
         ) {
@@ -40868,6 +42822,12 @@
 
     const economy = Object.freeze({
       STARTING_FUNDS_BALANCE_VERSION,
+      SOLVENCY_MARGIN_FACTORS,
+      SAFE_RECOMMENDED_LOAD_RATIO,
+      GUARANTEED_WATER_ACCESS_THRESHOLD,
+      WATER_SOURCE_GAP_SPAN_DAYS,
+      WATER_DELAY_RESERVE_DAYS,
+      WATER_PLANNING_SAFETY_FACTOR,
       authoredStartingFundsProfile,
       startingFundsQuote,
       startingFundsQuoteForRun:
@@ -40889,11 +42849,16 @@
         findNextMarketPath,
       segmentReservePlan,
       nextMarketReservePlan,
+      segmentWaterCarryPlan,
+      nextWaterCarryTarget,
       adjustedWaterNeed:
         adjustedWaterNeedForSegment,
       milestoneProvidesWater:
         milestoneProvidesDependableWater,
+      milestoneProvidesWaterResupply,
       refillWaterAtMilestone,
+      refillWaterOnTravelDay,
+      refillWaterAfterSegment,
       ensureMarketState,
       ensureEconomyState,
       openMarket,
@@ -40906,6 +42871,7 @@
       quoteSale,
       buy: purchaseItem,
       sell: sellItem,
+      buyRecommendedPlan,
       borrow:
         borrowEmergencyCredit,
       acknowledgeBriefing,
@@ -43091,28 +45057,50 @@
     }
 
     function loadMovementFactor(
-      loadRatio
+      loadRatio,
+      modeId = "standard"
     ) {
-      if (loadRatio <= 0.85) {
-        return 1;
-      }
+      let factor;
 
-      if (loadRatio <= 1) {
-        return (
+      if (loadRatio <= 0.85) {
+        factor = 1;
+      } else if (loadRatio <= 1) {
+        factor =
           1 -
           (
             loadRatio - 0.85
-          ) * 0.5
-        );
+          ) * 0.5;
+      } else {
+        factor =
+          Math.max(
+            0.42,
+            0.925 -
+              (
+                loadRatio - 1
+              ) * 1.4
+          );
       }
 
-      return Math.max(
-        0.42,
-        0.925 -
-          (
-            loadRatio - 1
-          ) * 1.4
-      );
+      /*
+       * Purchases are hard-blocked beyond 130% load in every mode. A load the
+       * store permits must not nearly double the calendar length and invalidate
+       * the route's own reserve calculation. Overloading still increases wear,
+       * consumes capacity, and carries a visible speed penalty.
+       */
+      if (
+        loadRatio <=
+          runModel.LEARNING_ASSIST
+            .maximumGuidedLoadRatio
+      ) {
+        factor =
+          Math.max(
+            runModel.LEARNING_ASSIST
+              .minimumLegalLoadMovementFactor,
+            factor
+          );
+      }
+
+      return factor;
     }
 
     function calculateMovement(
@@ -43171,7 +45159,8 @@
           pace.speedFactor,
         load:
           loadMovementFactor(
-            load.ratio
+            load.ratio,
+            run.modeId
           ),
         transportCondition:
           transportConditionFactor(
@@ -43281,6 +45270,12 @@
           run.policies.pace
         ];
 
+      const modeWearFactor =
+        runModel.pressure.factor(
+          run,
+          "wear"
+        );
+
       const repairSkill =
         selectors.partySkill(
           run,
@@ -43325,6 +45320,7 @@
           .definition
           .wearFactor *
         pace.wearFactor *
+        modeWearFactor *
         loadStress *
         maintenanceFactor *
         (
@@ -43444,6 +45440,9 @@
         animalStrain +=
           consumption.water
             .shortfall * 0.04;
+
+        animalStrain *=
+          modeWearFactor;
 
         run.transport
           .animalCondition =
@@ -43735,6 +45734,13 @@
           );
       }
 
+      const routeWaterRefill =
+        economy.refillWaterAfterSegment(
+          run,
+          segment,
+          milestone
+        );
+
       const codexUnlocked = [];
 
       for (
@@ -43833,6 +45839,7 @@
         milestone,
         destination,
         codexUnlocked,
+        routeWaterRefill,
         outgoing:
           index.outgoing(
             milestone.id
@@ -44077,7 +46084,9 @@
                 .currentDate
             ),
           endDay: null,
-          endDate: null
+          endDate: null,
+          travelDays: 0,
+          routeWaterRefills: 0
         });
 
       if (segment.branch) {
@@ -44563,6 +46572,61 @@
       run.metrics.daysTraveling +=
         1;
 
+      const activeTravelPath =
+        run.progress
+          .pathHistory[
+          run.progress
+            .pathHistory
+            .length - 1
+        ];
+
+      if (
+        activeTravelPath &&
+        activeTravelPath
+          .segmentId ===
+          segment.id
+      ) {
+        activeTravelPath
+          .travelDays =
+          (
+            Number(
+              activeTravelPath
+                .travelDays
+            ) || 0
+          ) + 1;
+
+        dayReport
+          .routeWaterRefill =
+          economy
+            .refillWaterOnTravelDay(
+              run,
+              segment,
+              activeTravelPath
+                .travelDays
+            );
+
+        if (
+          dayReport
+            .routeWaterRefill &&
+          dayReport
+            .routeWaterRefill
+            .added > 0
+        ) {
+          activeTravelPath
+            .routeWaterRefills =
+            (
+              Number(
+                activeTravelPath
+                  .routeWaterRefills
+              ) || 0
+            ) + 1;
+        }
+      } else {
+        dayReport
+          .routeWaterRefill =
+          null;
+      }
+
       const wear =
         applyTransportWear(
           run,
@@ -44906,6 +46970,28 @@
           report.stoppedReason =
             "event";
           break;
+        }
+
+        if (
+          !options
+            .overrideLearningGuard
+        ) {
+          const guidance =
+            runModel.advisor
+              .assess(run);
+
+          if (
+            guidance
+              .shouldStopTravel
+          ) {
+            report.stoppedReason =
+              "learning-guardrail";
+
+            report.advisor =
+              guidance;
+
+            break;
+          }
         }
 
         if (
@@ -46643,8 +48729,11 @@
       rng,
       context
     ) {
-      const mode =
-        selectors.mode(run);
+      const healthPressure =
+        runModel.pressure.factor(
+          run,
+          "health"
+        );
 
       const recovered = [];
       const progressed = [];
@@ -46694,7 +48783,7 @@
                 .progression
                 .baseChance
             ) *
-            mode.healthRiskFactor *
+            healthPressure *
             (
               state.stabilized
                 ? 0.45
@@ -46851,6 +48940,12 @@
       const weather =
         context.weatherDefinition;
 
+      const modeRiskFactor =
+        runModel.pressure.factor(
+          run,
+          "health"
+        );
+
       const clothingProtection =
         context.clothingProtection;
 
@@ -46892,6 +48987,7 @@
               0.0028 *
               weather
                 .healthRiskFactor *
+              modeRiskFactor *
               (
                 1 -
                 combinedColdProtection *
@@ -46978,6 +49074,7 @@
               0.0032 *
               weather
                 .healthRiskFactor *
+              modeRiskFactor *
               (
                 context.activity ===
                 "travel"
@@ -47057,6 +49154,7 @@
             ) /
               1000 *
               0.012 *
+              modeRiskFactor *
               (
                 1 -
                 acclimatization *
@@ -47108,8 +49206,11 @@
       rng,
       context
     ) {
-      const mode =
-        selectors.mode(run);
+      const healthPressure =
+        runModel.pressure.factor(
+          run,
+          "health"
+        );
 
       const sanitationSupply =
         Inventory.quantity(
@@ -47152,7 +49253,7 @@
         0.0024 *
         context.weatherDefinition
           .healthRiskFactor *
-        mode.healthRiskFactor *
+        healthPressure *
         sanitationFactor *
         (
           member.nutrition < 55 ||
@@ -47250,6 +49351,7 @@
         ) *
         terrain.fatigueFactor *
         pace.accidentFactor *
+        healthPressure *
         context.weatherDefinition
           .fatigueFactor *
         (
@@ -47395,98 +49497,260 @@
             .learningRescueTokens
         ) || 0;
 
-      const evacuated =
+      const livingBefore =
+        Party.alive(run).length;
+
+      const learningAssisted =
+        run.modeId ===
+          "learning" &&
         learningTokens > 0;
 
-      if (evacuated) {
-        run.flags
-          .learningRescueTokens =
-          learningTokens - 1;
+      /*
+       * Never silently destroy the final surviving traveler. Standard and
+       * Expedition still permit ordinary companion loss, but the final
+       * traveler is stabilized and the intervention is scored as emergency
+       * recovery. This keeps a long educational run recoverable.
+       */
+      const finalTravelerProtected =
+        livingBefore <= 1;
 
-        member.alive = false;
-        member.health = 1;
-        member.outcome =
-          "evacuated";
-        member.departedDay =
-          run.calendar.dayIndex;
-        member.lossCause =
-          cause;
+      const assisted =
+        learningAssisted ||
+        finalTravelerProtected;
 
-        run.metrics
-          .travelersEvacuated =
-          (
-            run.metrics
-              .travelersEvacuated ||
-            0
-          ) + 1;
+      if (assisted) {
+        const assistanceKind =
+          learningAssisted
+            ? "learning-stabilization"
+            : "final-traveler-recovery";
+
+        if (learningAssisted) {
+          run.flags
+            .learningRescueTokens =
+            Math.max(
+              0,
+              learningTokens - 1
+            );
+
+          run.metrics
+            .learningAssists =
+            (
+              run.metrics
+                .learningAssists ||
+              0
+            ) + 1;
+
+          run.flags
+            .learningAssistanceUsed =
+            true;
+        } else {
+          run.flags
+            .emergencyRecoveryTokens =
+            0;
+
+          run.flags
+            .emergencyRecoveryUsed =
+            true;
+
+          run.flags
+            .emergencyRecoveryUses =
+            (
+              Number(
+                run.flags
+                  .emergencyRecoveryUses
+              ) || 0
+            ) + 1;
+
+          run.metrics
+            .emergencyRecoveries =
+            (
+              run.metrics
+                .emergencyRecoveries ||
+              0
+            ) + 1;
+        }
+
+        member.alive = true;
+
+        member.health =
+          Math.max(
+            runModel.LEARNING_ASSIST
+              .rescueHealth,
+            Number(
+              member.health
+            ) || 0
+          );
+
+        member.morale =
+          Math.max(
+            35,
+            Number(
+              member.morale
+            ) || 0
+          );
+
+        member.fatigue =
+          Math.min(
+            runModel.LEARNING_ASSIST
+              .rescueFatigue,
+            Number(
+              member.fatigue
+            ) || 0
+          );
+
+        member.nutrition =
+          Math.max(
+            runModel.LEARNING_ASSIST
+              .rescueNutrition,
+            Number(
+              member.nutrition
+            ) || 0
+          );
+
+        member.hydration =
+          Math.max(
+            runModel.LEARNING_ASSIST
+              .rescueHydration,
+            Number(
+              member.hydration
+            ) || 0
+          );
+
+        const immediatelyLethal =
+          new Set([
+            "exhausted",
+            "starving",
+            "severe-dehydration",
+            "hypothermia",
+            "heat-exhaustion"
+          ]);
+
+        member.conditions =
+          member.conditions
+            .filter(
+              (state) =>
+                !immediatelyLethal
+                  .has(
+                    state.id
+                  )
+            );
+
+        for (
+          const state of
+          member.conditions
+        ) {
+          state.stabilized =
+            true;
+
+          state.lastTreatedDay =
+            run.calendar
+              .dayIndex;
+        }
+
+        delete member.outcome;
+        delete member.departedDay;
+        delete member.lossCause;
+
+        member.history
+          .closeCalls += 1;
 
         Journal.add(
           run,
           {
             type:
-              "traveler-evacuated",
+              assistanceKind,
             title:
-              `${member.name} Was Evacuated`,
+              `${member.name} Was Stabilized`,
             text:
-              `Learning-mode assistance removed ${member.name} from the expedition after ${cause.toLowerCase()}.`,
+              learningAssisted
+                ? `Learning-mode emergency assistance prevented the loss of ` +
+                  `${member.name} after ${String(cause).toLowerCase()}. ` +
+                  `The assistance will reduce the final score.`
+                : `${member.name}, the expedition's final surviving traveler, ` +
+                  `was stabilized after ${String(cause).toLowerCase()}. ` +
+                  `The emergency intervention is recorded and will reduce the final score.`,
             tone: "warning",
             key: true,
             tags: [
-              "party-loss",
-              "evacuation"
+              "assistance",
+              "close-call",
+              assistanceKind
             ],
             data: {
               memberId:
                 member.id,
-              cause
+              cause,
+              assistanceKind,
+              remainingLearningTokens:
+                Number(
+                  run.flags
+                    .learningRescueTokens
+                ) || 0,
+              emergencyRecoveryUses:
+                Number(
+                  run.flags
+                    .emergencyRecoveryUses
+                ) || 0
             }
           }
         );
-      } else {
-        member.alive = false;
-        member.health = 0;
-        member.outcome = "died";
-        member.departedDay =
-          run.calendar.dayIndex;
-        member.lossCause =
-          cause;
 
-        run.metrics
-          .travelersLost =
-          (
-            run.metrics
-              .travelersLost ||
-            0
-          ) + 1;
-
-        Journal.add(
-          run,
-          {
-            type:
-              "traveler-lost",
-            title:
-              `${member.name} Died`,
-            text:
-              `${member.name} died after ${cause.toLowerCase()}.`,
-            tone: "danger",
-            key: true,
-            tags: [
-              "party-loss",
-              "death"
-            ],
-            data: {
-              memberId:
-                member.id,
-              cause
-            }
-          }
-        );
+        return {
+          memberId:
+            member.id,
+          assisted: true,
+          assistanceKind,
+          evacuated: false,
+          cause
+        };
       }
+
+      member.alive = false;
+      member.health = 0;
+      member.outcome = "died";
+      member.departedDay =
+        run.calendar.dayIndex;
+      member.lossCause =
+        cause;
+
+      run.metrics
+        .travelersLost =
+        (
+          run.metrics
+            .travelersLost ||
+          0
+        ) + 1;
+
+      Journal.add(
+        run,
+        {
+          type:
+            "traveler-lost",
+          title:
+            `${member.name} Died`,
+          text:
+            `${member.name} died after ${String(cause).toLowerCase()}.`,
+          tone: "danger",
+          key: true,
+          tags: [
+            "party-loss",
+            "death"
+          ],
+          data: {
+            memberId:
+              member.id,
+            cause
+          }
+        }
+      );
 
       const survivors =
         Party.alive(run);
 
-      for (const survivor of survivors) {
+      for (
+        const survivor of
+        survivors
+      ) {
         addCondition(
           run,
           survivor,
@@ -47500,12 +49764,7 @@
 
         survivor.morale =
           util.clamp(
-            survivor.morale -
-              (
-                evacuated
-                  ? 5
-                  : 12
-              ),
+            survivor.morale - 12,
             0,
             100
           );
@@ -47514,15 +49773,15 @@
       run.party.griefLevel =
         util.clamp(
           run.party.griefLevel +
-            (
-              evacuated
-                ? 8
-                : 20
-            ),
+            20,
           0,
           100
         );
 
+      /*
+       * The final traveler is protected above, so this remains only as a
+       * defensive invariant for malformed imported state.
+       */
       if (!survivors.length) {
         run.status = "failed";
         run.phase = "ending";
@@ -47553,8 +49812,10 @@
       }
 
       return {
-        memberId: member.id,
-        evacuated,
+        memberId:
+          member.id,
+        assisted: false,
+        evacuated: false,
         cause
       };
     }
@@ -47686,6 +49947,12 @@
         content.require(
           "terrains",
           segment.terrainId
+        );
+
+      const healthPressure =
+        runModel.pressure.factor(
+          run,
+          "health"
         );
 
       const ration =
@@ -47833,7 +50100,11 @@
               fatigueDelta > 0
             ) {
               fatigueDelta *=
-                hardyFactor;
+                hardyFactor *
+                runModel.pressure.factor(
+                  run,
+                  "fatigue"
+                );
             }
 
             if (
@@ -47852,7 +50123,7 @@
                 100
               );
 
-            const nutritionDelta =
+            let nutritionDelta =
               foodRatio >= 0.98
                 ? ration.id ===
                     "generous"
@@ -47869,13 +50140,27 @@
                       : 0
                   );
 
-            const hydrationDelta =
+            let hydrationDelta =
               waterRatio >= 0.98
                 ? 2
                 : -(
                     1 -
                     waterRatio
                   ) * 34;
+
+            if (
+              nutritionDelta < 0
+            ) {
+              nutritionDelta *=
+                healthPressure;
+            }
+
+            if (
+              hydrationDelta < 0
+            ) {
+              hydrationDelta *=
+                healthPressure;
+            }
 
             member.nutrition =
               util.clamp(
@@ -47948,6 +50233,13 @@
                   .groupCohesion -
                 50
               ) * 0.006;
+
+            if (
+              moraleDelta < 0
+            ) {
+              moraleDelta *=
+                healthPressure;
+            }
 
             member.morale =
               util.clamp(
@@ -48030,6 +50322,13 @@
 
               healthDelta +=
                 recovery;
+            }
+
+            if (
+              healthDelta < 0
+            ) {
+              healthDelta *=
+                healthPressure;
             }
 
             member.health =
@@ -50779,6 +53078,514 @@
       }));
     }
 
+
+    function learningAssistanceStatus(
+      run
+    ) {
+      requireRun(run);
+
+      const supplies =
+        selectors
+          .supplyForecast(run);
+
+      const durabilityRatio =
+        run.transport
+          .maximumDurability > 0
+          ? run.transport
+              .durability /
+            run.transport
+              .maximumDurability
+          : 0;
+
+      const animalCritical =
+        run.transport
+          .animalCount > 0 &&
+        run.transport
+          .animalCondition <= 5;
+
+      const critical =
+        Boolean(
+          run.flags
+            .transportDisabled
+        ) ||
+        durabilityRatio <= 0.02 ||
+        animalCritical ||
+        (
+          supplies.foodDays !==
+            null &&
+          supplies.foodDays < 0.5
+        ) ||
+        (
+          supplies.waterDays !==
+            null &&
+          supplies.waterDays < 0.2
+        ) ||
+        Party.alive(run).some(
+          (member) =>
+            member.health <= 10
+        );
+
+      const tokens =
+        Number(
+          run.flags
+            .emergencyRecoveryTokens
+        ) || 0;
+
+      const recoveryUses =
+        Math.max(
+          0,
+          Math.trunc(
+            Number(
+              run.flags
+                .emergencyRecoveryUses
+            ) || 0
+          )
+        );
+
+      const finished =
+        [
+          "completed",
+          "failed",
+          "abandoned"
+        ].includes(
+          run.status
+        );
+
+      return {
+        available:
+          critical &&
+          !finished,
+        critical,
+        tokens,
+        recoveryUses,
+        supplies,
+        durabilityRatio,
+        animalCritical
+      };
+    }
+
+    function useLearningAssistance(
+      run
+    ) {
+      const status =
+        learningAssistanceStatus(
+          run
+        );
+
+      if (!status.critical) {
+        throw new SimulationError(
+          "Emergency assistance is reserved for an otherwise irrecoverable expedition state.",
+          {
+            code:
+              "LEARNING_ASSISTANCE_NOT_NEEDED"
+          }
+        );
+      }
+
+      run.flags
+        .emergencyRecoveryTokens =
+        0;
+
+      run.flags
+        .emergencyRecoveryUsed =
+        true;
+
+      run.flags
+        .emergencyRecoveryUses =
+        (
+          Number(
+            run.flags
+              .emergencyRecoveryUses
+          ) || 0
+        ) + 1;
+
+      run.metrics
+        .emergencyRecoveries =
+        (
+          run.metrics
+            .emergencyRecoveries ||
+          0
+        ) + 1;
+
+      const granted = [];
+
+      function addToTarget(
+        itemId,
+        target
+      ) {
+        const current =
+          Inventory.quantity(
+            run.inventory,
+            itemId
+          );
+
+        const quantity =
+          util.roundTo(
+            Math.max(
+              0,
+              target - current
+            ),
+            3
+          );
+
+        if (quantity <= 0) {
+          return 0;
+        }
+
+        Inventory.add(
+          run.inventory,
+          itemId,
+          quantity,
+          {
+            source:
+              "emergency-recovery",
+            acquiredDay:
+              run.calendar
+                .dayIndex,
+            unitCost: 0,
+            quality: 90,
+            metadata: {
+              emergencyRecovery:
+                true
+            }
+          }
+        );
+
+        granted.push({
+          itemId,
+          quantity
+        });
+
+        return quantity;
+      }
+
+      const durabilityTarget =
+        run.transport
+          .maximumDurability *
+        runModel.LEARNING_ASSIST
+          .rescueDurabilityRatio;
+
+      run.transport.durability =
+        Math.max(
+          run.transport
+            .durability,
+          durabilityTarget
+        );
+
+      for (
+        const componentId of
+        Object.keys(
+          run.transport
+            .components
+        )
+      ) {
+        run.transport
+          .components[
+          componentId
+        ] =
+          Math.max(
+            run.transport
+              .components[
+              componentId
+            ],
+            25
+          );
+      }
+
+      if (
+        run.transport
+          .animalCount > 0
+      ) {
+        run.transport
+          .animalCondition =
+          Math.max(
+            run.transport
+              .animalCondition,
+            runModel.LEARNING_ASSIST
+              .rescueAnimalCondition
+          );
+      }
+
+      run.flags
+        .transportDisabled =
+        false;
+
+      run.flags
+        .transportFailureRecorded =
+        false;
+
+      const needs =
+        selectors.dailyNeeds(
+          run
+        );
+
+      const foodTarget =
+        needs.foodKg *
+        runModel.LEARNING_ASSIST
+          .rescueFoodDays;
+
+      const currentFood =
+        Inventory.quantity(
+          run.inventory,
+          "staple-food"
+        ) +
+        Inventory.quantity(
+          run.inventory,
+          "fresh-food"
+        );
+
+      if (
+        currentFood <
+        foodTarget
+      ) {
+        addToTarget(
+          "staple-food",
+          Inventory.quantity(
+            run.inventory,
+            "staple-food"
+          ) +
+          (
+            foodTarget -
+            currentFood
+          )
+        );
+      }
+
+      const waterTarget =
+        needs.waterLiters *
+        runModel.LEARNING_ASSIST
+          .rescueWaterDays;
+
+      let containerGuard = 0;
+
+      while (
+        Transport.waterCapacity(
+          run
+        ) <
+          waterTarget &&
+        containerGuard < 20
+      ) {
+        containerGuard += 1;
+
+        Inventory.add(
+          run.inventory,
+          "water-container",
+          1,
+          {
+            source:
+              "emergency-recovery",
+            acquiredDay:
+              run.calendar
+                .dayIndex,
+            unitCost: 0,
+            quality: 90,
+            metadata: {
+              emergencyRecovery:
+                true
+            }
+          }
+        );
+
+        granted.push({
+          itemId:
+            "water-container",
+          quantity: 1
+        });
+      }
+
+      addToTarget(
+        "water",
+        Math.min(
+          waterTarget,
+          Transport.waterCapacity(
+            run
+          )
+        )
+      );
+
+      if (
+        run.transport
+          .animalCount > 0
+      ) {
+        addToTarget(
+          "fodder",
+          needs.fodderKg *
+            runModel.LEARNING_ASSIST
+              .rescueFodderDays
+        );
+      }
+
+      addToTarget(
+        "tool-kit",
+        1
+      );
+
+      addToTarget(
+        "repair-materials",
+        2
+      );
+
+      addToTarget(
+        "medicine",
+        2
+      );
+
+      addToTarget(
+        "bandages",
+        2
+      );
+
+      for (
+        const member of
+        Party.alive(run)
+      ) {
+        member.health =
+          Math.max(
+            member.health,
+            runModel.LEARNING_ASSIST
+              .rescueHealth
+          );
+
+        member.fatigue =
+          Math.min(
+            member.fatigue,
+            runModel.LEARNING_ASSIST
+              .rescueFatigue
+          );
+
+        member.nutrition =
+          Math.max(
+            member.nutrition,
+            runModel.LEARNING_ASSIST
+              .rescueNutrition
+          );
+
+        member.hydration =
+          Math.max(
+            member.hydration,
+            runModel.LEARNING_ASSIST
+              .rescueHydration
+          );
+
+        for (
+          const condition of
+          member.conditions
+        ) {
+          condition.stabilized =
+            true;
+        }
+      }
+
+      /*
+       * If the rescue supplies themselves produce an extreme load, provide
+       * only enough support pack gear to return below the existing hard
+       * purchase boundary. This is part of the single emergency intervention.
+       */
+      let load =
+        Transport.loadState(
+          run
+        );
+
+      let loadGuard = 0;
+
+      while (
+        load.ratio > 1.25 &&
+        loadGuard < 24
+      ) {
+        loadGuard += 1;
+
+        Inventory.add(
+          run.inventory,
+          "pack-gear",
+          1,
+          {
+            source:
+              "emergency-recovery",
+            acquiredDay:
+              run.calendar
+                .dayIndex,
+            unitCost: 0,
+            quality: 90,
+            metadata: {
+              emergencyRecovery:
+                true
+            }
+          }
+        );
+
+        granted.push({
+          itemId:
+            "pack-gear",
+          quantity: 1
+        });
+
+        load =
+          Transport.loadState(
+            run
+          );
+      }
+
+      Journal.add(
+        run,
+        {
+          type:
+            "emergency-recovery",
+          title:
+            "Emergency Expedition Recovery",
+          text:
+            "A hard-lock recovery restored a minimal serviceable state. " +
+            "The intervention is recorded, may be used again if another hard lock occurs, " +
+            "and will reduce the final score.",
+          tone: "warning",
+          key: true,
+          tags: [
+            "emergency",
+            "assistance",
+            "recovery"
+          ],
+          data: {
+            granted:
+              util.deepClone(
+                granted
+              ),
+            remainingTokens:
+              run.flags
+                .emergencyRecoveryTokens
+          }
+        }
+      );
+
+      economy.touchRun(
+        run
+      );
+
+      return {
+        assisted: true,
+        remainingTokens:
+          run.flags
+            .emergencyRecoveryTokens,
+        recoveryUses:
+          run.flags
+            .emergencyRecoveryUses,
+        granted,
+        durability:
+          run.transport
+            .durability,
+        animalCondition:
+          run.transport
+            .animalCondition,
+        load:
+          Transport.loadState(
+            run
+          ),
+        supplies:
+          selectors
+            .supplyForecast(
+              run
+            )
+      };
+    }
+
     /* ======================================================================
        08. PERSISTENT ACTION COMMANDS
        ====================================================================== */
@@ -51000,6 +53807,19 @@
           );
         },
 
+        learningAssist(
+          store
+        ) {
+          return partyCommand(
+            store,
+            "learning-assistance",
+            (run) =>
+              useLearningAssistance(
+                run
+              )
+          );
+        },
+
         useService(
           store,
           serviceId,
@@ -51047,6 +53867,13 @@
           availableTownServices,
         useService:
           useTownService,
+        learningAssistance:
+          Object.freeze({
+            status:
+              learningAssistanceStatus,
+            use:
+              useLearningAssistance
+          }),
         segmentPressure,
         commands:
           PartyCommands
@@ -53268,8 +56095,11 @@
           trigger
         ] ?? 0.15;
 
-      const mode =
-        selectors.mode(run);
+      const eventPressure =
+        runModel.pressure.factor(
+          run,
+          "event"
+        );
 
       const averageSeverity =
         candidates.length
@@ -53292,7 +56122,7 @@
 
       return util.clamp(
         base *
-          mode.eventRiskFactor *
+          eventPressure *
           severityFactor,
         0,
         0.95
@@ -53872,6 +56702,46 @@
       }
 
       return fallback;
+    }
+
+    function adverseEffectAmount(
+      run,
+      type,
+      amount
+    ) {
+      const value =
+        Number(amount) || 0;
+
+      if (
+        type === "fatigue" &&
+        value > 0
+      ) {
+        return (
+          value *
+          runModel.pressure.factor(
+            run,
+            "fatigue"
+          )
+        );
+      }
+
+      if (
+        (
+          type === "health" ||
+          type === "morale"
+        ) &&
+        value < 0
+      ) {
+        return (
+          value *
+          runModel.pressure.factor(
+            run,
+            "health"
+          )
+        );
+      }
+
+      return value;
     }
 
     function targetedMembers(
@@ -54513,12 +57383,19 @@
         case "health":
         case "morale":
         case "fatigue": {
-          const amount =
+          const rawAmount =
             resolveNumeric(
               effect.amount,
               rng,
               runtime,
               0
+            );
+
+          const amount =
+            adverseEffectAmount(
+              run,
+              effect.type,
+              rawAmount
             );
 
           const members =
@@ -54686,7 +57563,7 @@
         }
 
         case "transport-damage": {
-          const amount =
+          const rawAmount =
             Math.max(
               0,
               resolveNumeric(
@@ -54695,6 +57572,13 @@
                 runtime,
                 0
               )
+            );
+
+          const amount =
+            rawAmount *
+            runModel.pressure.factor(
+              run,
+              "wear"
             );
 
           const before =
@@ -54818,13 +57702,22 @@
             };
           }
 
-          const amount =
+          const rawAmount =
             resolveNumeric(
               effect.amount,
               rng,
               runtime,
               0
             );
+
+          const amount =
+            rawAmount < 0
+              ? rawAmount *
+                runModel.pressure.factor(
+                  run,
+                  "wear"
+                )
+              : rawAmount;
 
           const before =
             run.transport
@@ -69538,6 +72431,90 @@
         );
       }
 
+      const learningAssists =
+        Math.max(
+          0,
+          Math.trunc(
+            Number(
+              run.metrics
+                .learningAssists
+            ) || 0
+          )
+        );
+
+      if (
+        learningAssists > 0
+      ) {
+        entries.push(
+          scoreEntry(
+            "learning-assistance",
+            "Emergency Learning assistance",
+            -runModel.LEARNING_ASSIST
+              .rescueScorePenalty *
+              learningAssists,
+            null,
+            `${learningAssists} emergency assistance ` +
+              `${learningAssists === 1 ? "intervention was" : "interventions were"} used.`,
+            "warning"
+          )
+        );
+      }
+
+      const emergencyRecoveries =
+        Math.max(
+          0,
+          Math.trunc(
+            Number(
+              run.metrics
+                .emergencyRecoveries
+            ) || 0
+          )
+        );
+
+      if (
+        emergencyRecoveries > 0
+      ) {
+        const penaltyTable =
+          runModel.LEARNING_ASSIST
+            .emergencyRecoveryScorePenaltyByMode;
+
+        const penaltyPerRecovery =
+          Number(
+            penaltyTable &&
+            penaltyTable[
+              run.modeId
+            ]
+          ) || 1000;
+
+        /*
+         * Repeated recoveries remain available, but their cumulative score
+         * cost grows as 1 + 2 + ... + N.
+         */
+        const recoveryPenalty =
+          penaltyPerRecovery *
+          (
+            emergencyRecoveries *
+            (
+              emergencyRecoveries +
+              1
+            ) /
+            2
+          );
+
+        entries.push(
+          scoreEntry(
+            "emergency-recovery",
+            "Emergency expedition recovery",
+            -recoveryPenalty,
+            null,
+            `${emergencyRecoveries} hard-lock recovery ` +
+              `${emergencyRecoveries === 1 ? "was" : "interventions were"} used; ` +
+              `repeated interventions carry progressively larger score costs.`,
+            "warning"
+          )
+        );
+      }
+
       const rawBase =
         entries.reduce(
           (total, entry) =>
@@ -74640,6 +77617,9 @@
                     : null
               })
             ),
+          advisor:
+            runModel.advisor
+              .assess(run),
           actions:
             availableJourneyActions(
               run
@@ -76319,6 +79299,18 @@
       );
 
       register(
+        "store.buy-recommended",
+        (
+          payload,
+          game
+        ) =>
+          TA.economyCommands
+            .buyRecommended(
+              game.store
+            )
+      );
+
+      register(
         "store.sell",
         (
           payload,
@@ -76400,7 +79392,12 @@
               {
                 days:
                   payload.days ||
-                  3
+                  3,
+                overrideLearningGuard:
+                  Boolean(
+                    payload
+                      .overrideLearningGuard
+                  )
               }
             )
       );
@@ -76492,6 +79489,18 @@
             .treat(
               game.store,
               payload
+            )
+      );
+
+      register(
+        "journey.learning-assist",
+        (
+          payload,
+          game
+        ) =>
+          TA.partyCommands
+            .learningAssist(
+              game.store
             )
       );
 
@@ -90985,6 +93994,16 @@
             ),
             button(
               outfitting
+                ? "Prepare route plan"
+                : "Restock for the next stages",
+              "market.buy-recommended",
+              {
+                className:
+                  "button button--primary button--wide"
+              }
+            ),
+            button(
+              outfitting
                 ? "View current purchases"
                 : "View inventory",
               "nav.inventory",
@@ -91101,6 +94120,181 @@
     /* ======================================================================
        06. JOURNEY DASHBOARD
        ====================================================================== */
+
+
+    function renderJourneyAdvisor(
+      model
+    ) {
+      const advisor =
+        model.advisor;
+
+      if (
+        !advisor ||
+        !advisor.primary
+      ) {
+        return null;
+      }
+
+      const primary =
+        advisor.primary;
+
+      const actions = [
+        button(
+          primary.actionLabel,
+          primary.action,
+          {
+            className:
+              "button button--primary"
+          }
+        )
+      ];
+
+      if (
+        advisor.shouldStopTravel &&
+        model.run.status ===
+          "traveling"
+      ) {
+        actions.push(
+          button(
+            "Travel 1 day anyway",
+            "journey.travel-override",
+            {
+              className:
+                "button button--danger-outline"
+            }
+          )
+        );
+      }
+
+      return panel(
+        [
+          dom.el(
+            "div",
+            {
+              class:
+                "panel__header"
+            },
+            [
+              dom.el(
+                "div",
+                {},
+                [
+                  dom.el(
+                    "p",
+                    {
+                      class:
+                        "eyebrow",
+                      text:
+                        advisor.learningMode
+                          ? "Guided Learning"
+                          : "Trail safety"
+                    }
+                  ),
+                  dom.el(
+                    "h2",
+                    {
+                      text:
+                        "Recommended next action"
+                    }
+                  )
+                ]
+              ),
+              badge(
+                advisor.assistanceAvailable
+                  ? "Emergency recovery available"
+                  : advisor.recoveryUses >
+                      0
+                    ? `${advisor.recoveryUses} recovery ` +
+                      `${advisor.recoveryUses === 1 ? "use" : "uses"} recorded`
+                    : "Recovery reserved",
+                advisor.assistanceAvailable
+                  ? "warning"
+                  : advisor.rescueTokens >
+                      0
+                    ? "info"
+                    : "warning"
+              )
+            ]
+          ),
+          callout(
+            primary.code
+              .replace(
+                /-/g,
+                " "
+              )
+              .replace(
+                /\b\w/g,
+                (letter) =>
+                  letter
+                    .toUpperCase()
+              ),
+            primary.message,
+            primary.tone
+          ),
+          advisor.issues.length >
+            1
+            ? dom.el(
+                "ul",
+                {
+                  class:
+                    "data-list"
+                },
+                advisor.issues
+                  .slice(1)
+                  .map(
+                    (issue) =>
+                      dom.el(
+                        "li",
+                        {
+                          class:
+                            "data-row"
+                        },
+                        [
+                          dom.el(
+                            "div",
+                            {
+                              class:
+                                "data-row__main"
+                            },
+                            [
+                              dom.el(
+                                "span",
+                                {
+                                  class:
+                                    "data-row__description",
+                                  text:
+                                    issue.message
+                                }
+                              )
+                            ]
+                          ),
+                          badge(
+                            issue.tone,
+                            issue.tone
+                          )
+                        ]
+                      )
+                  )
+              )
+            : null,
+          dom.el(
+            "div",
+            {
+              class:
+                "button-row"
+            },
+            actions
+          )
+        ],
+        {
+          className:
+            primary.tone ===
+              "danger"
+              ? "panel--danger"
+              : "panel--accent"
+        }
+      );
+    }
 
     function journeyStatusCallouts(
       model
@@ -91530,6 +94724,11 @@
               Boolean(
                 run.flags
                   .transportDisabled
+              ) ||
+              Boolean(
+                model.advisor &&
+                model.advisor
+                  .shouldStopTravel
               ),
             dataset: {
               days: "3"
@@ -91548,6 +94747,11 @@
               Boolean(
                 run.flags
                   .transportDisabled
+              ) ||
+              Boolean(
+                model.advisor &&
+                model.advisor
+                  .shouldStopTravel
               ),
             dataset: {
               days: "1"
@@ -91614,6 +94818,9 @@
         [
           header.node,
           ...statusCallouts,
+          renderJourneyAdvisor(
+            model
+          ),
           panel(
             [
               dom.el(
@@ -94321,6 +97528,73 @@
       }
     );
 
+
+    ui.registerAction(
+      "market.buy-recommended",
+      async () => {
+        const confirmed =
+          await ui.confirm(
+            activeRun().status ===
+              "outfitting"
+              ? "Prepare the route plan?"
+              : "Restock for the next stages?",
+            "Trail Atlas will buy available recommendations in a safe dependency order: " +
+              "containers and durable equipment first, followed by provisions and water. " +
+              "Normal market prices, funds, stock, and load limits still apply.",
+            {
+              confirmLabel:
+                activeRun().status ===
+                  "outfitting"
+                  ? "Prepare outfit"
+                  : "Restock"
+            }
+          );
+
+        if (!confirmed) {
+          return;
+        }
+
+        const response =
+          await game.dispatch(
+            "store.buy-recommended"
+          );
+
+        const result =
+          domainResult(
+            response
+          );
+
+        if (
+          result &&
+          result.essentialSkipped &&
+          result
+            .essentialSkipped
+            .length
+        ) {
+          ui.toast(
+            `${result.purchased.length} recommendations were purchased, but ` +
+              `${result.essentialSkipped.length} essential recommendation` +
+              `${result.essentialSkipped.length === 1 ? " was" : "s were"} skipped. ` +
+              "Review funds, stock, capacity, and the departure assessment.",
+            "warning",
+            {
+              duration: 8000
+            }
+          );
+        } else {
+          ui.toast(
+            `${result ? result.purchased.length : 0} recommended purchase` +
+              `${result && result.purchased.length === 1 ? " was" : "s were"} completed.`,
+            "success"
+          );
+        }
+
+        ui.render({
+          focus: false
+        });
+      }
+    );
+
     ui.registerAction(
       "market.reset",
       async () => {
@@ -94488,6 +97762,67 @@
                 target.dataset
                   .days
               ) || 3
+          }
+        );
+      }
+    );
+
+
+    ui.registerAction(
+      "journey.travel-override",
+      async () => {
+        const confirmed =
+          await ui.confirm(
+            "Travel despite the Learning warning?",
+            "This explicitly overrides the current Guided Learning stop for one day. " +
+              "The warning will return if the risk remains.",
+            {
+              danger: true,
+              confirmLabel:
+                "Travel 1 day anyway"
+            }
+          );
+
+        if (!confirmed) {
+          return;
+        }
+
+        await dispatchFollow(
+          "journey.travel",
+          {
+            days: 1,
+            overrideLearningGuard:
+              true
+          }
+        );
+      }
+    );
+
+    ui.registerAction(
+      "journey.learning-assist",
+      async () => {
+        const confirmed =
+          await ui.confirm(
+            "Use emergency recovery?",
+            "This hard-lock recovery restores only a minimal serviceable state. " +
+              "Each use applies a visible mode-scaled score penalty, and repeated uses cost progressively more score.",
+            {
+              danger: true,
+              confirmLabel:
+                "Use assistance"
+            }
+          );
+
+        if (!confirmed) {
+          return;
+        }
+
+        await dispatchFollow(
+          "journey.learning-assist",
+          {},
+          {
+            message:
+              "Emergency recovery restored a minimal serviceable state."
           }
         );
       }
@@ -100129,11 +103464,48 @@
          * Journey, Town, event, outcome, and persistence paths work together.
          * The diagnostic uses only an in-memory world.
          */
+        if (
+          !TA.humanWinnabilityPatch ||
+          TA.humanWinnabilityPatch
+            .version !==
+            "TRAIL_ATLAS_HUMAN_WINNABILITY_PATCH_V14"
+        ) {
+          throw new Error(
+            "Trail Atlas Human Winnability Patch V14 did not initialize."
+          );
+        }
+
+        if (
+          !TA.humanePressurePatch ||
+          TA.humanePressurePatch
+            .version !==
+            "TRAIL_ATLAS_HUMANE_PRESSURE_FAIL_FORWARD_PATCH_V15"
+        ) {
+          throw new Error(
+            "Trail Atlas Humane Pressure and Fail-Forward Patch V15 did not initialize."
+          );
+        }
+
+        if (
+          !TA.solvencyLogisticsPatch ||
+          TA.solvencyLogisticsPatch
+            .version !==
+            "TRAIL_ATLAS_SOLVENCY_AND_LOGISTICS_PATCH_V16"
+        ) {
+          throw new Error(
+            "Trail Atlas Solvency and Logistics Patch V16 did not initialize."
+          );
+        }
+
         const repairSmokeReport =
           await diagnostics.run({
             ids: [
               "repair.core-smoke",
-              "repair.starting-funds-parity"
+              "repair.starting-funds-parity",
+              "repair.guided-learning-v13",
+              "repair.human-winnability-v14",
+              "repair.humane-pressure-v15",
+              "repair.solvency-logistics-v16"
             ],
             stopOnCriticalFailure:
               true
@@ -100223,14 +103595,41 @@
                       );
 
                   if (
-                    run.status ===
-                      "outfitting"
+                    ![
+                      "completed",
+                      "failed",
+                      "abandoned"
+                    ].includes(
+                      run.status
+                    )
                   ) {
                     const fundsQuote =
-                      TA.economy
-                        .startingFundsQuoteForRun(
-                          run
-                        );
+                      run.status ===
+                        "outfitting"
+                        ? TA.economy
+                            .startingFundsQuoteForRun(
+                              run
+                            )
+                        : TA.economy
+                            .startingFundsQuote(
+                              draft,
+                              {
+                                routeId:
+                                  run.routeId,
+                                professionId:
+                                  run.professionId,
+                                modeId:
+                                  run.modeId,
+                                seed:
+                                  run.seed
+                              },
+                              {
+                                runId:
+                                  "run-v16-active-funds-preview",
+                                timestamp:
+                                  "2000-01-01T00:00:00.000Z"
+                              }
+                            );
 
                     result.startingFunds =
                       TA.economy
@@ -100238,6 +103637,11 @@
                           run,
                           fundsQuote
                         );
+                  } else {
+                    run.flags
+                      .startingFundsBalanceVersion =
+                      TA.economy
+                        .STARTING_FUNDS_BALANCE_VERSION;
                   }
 
                   return result;
@@ -119911,5 +123315,3091 @@ qqqqqqqqqqqqqqo=
 })();
 </script>
 <!-- TRAIL_ATLAS_SCENE_AUDIO_PATCH_V9_AUDIO_END -->
+
+
+<script id="trail-atlas-guided-learning-v13-diagnostics">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_GUIDED_LEARNING_PATCH_V13";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.diagnostics ||
+    !TA.runModel ||
+    !TA.economy ||
+    !TA.partyActions ||
+    !TA.travel
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} diagnostics require the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.guidedLearningPatch &&
+    TA.guidedLearningPatch
+      .version ===
+      PATCH_VERSION
+  ) {
+    return;
+  }
+
+  Object.defineProperty(
+    TA,
+    "guidedLearningPatch",
+    {
+      value:
+        Object.freeze({
+          version:
+            PATCH_VERSION,
+          advisor:
+            TA.runModel
+              .advisor,
+          thresholds:
+            TA.runModel
+              .LEARNING_ASSIST
+        }),
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  if (
+    !TA.diagnostics
+      .list()
+      .some(
+        (test) =>
+          test.id ===
+          "repair.guided-learning-v13"
+      )
+  ) {
+    TA.diagnostics.register({
+      id:
+        "repair.guided-learning-v13",
+      label:
+        "Guided Learning advisor, outfit, load floor, rescue, and emergency recovery work",
+      group: "repair",
+      critical: true,
+      section: 20,
+      run({
+        assert: check
+      }) {
+        const world =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-guided-learning-v13",
+              worldSeed:
+                "guided-learning-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const run =
+          TA.runFactory.create(
+            {
+              routeId:
+                "oregon-trail",
+              professionId:
+                "scholar",
+              modeId:
+                "learning",
+              seed:
+                "guided-learning-v13-advisor"
+            },
+            world,
+            {
+              runId:
+                "run-guided-learning-v13-advisor",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        run.status =
+          "traveling";
+
+        run.phase =
+          "journey";
+
+        run.progress
+          .currentSegmentId =
+          TA.content
+            .getRouteIndex(
+              run.routeId
+            )
+            .outgoing(
+              run.progress
+                .currentMilestoneId
+            )[0].id;
+
+        for (
+          const member of
+          run.party.members
+        ) {
+          member.fatigue = 56;
+        }
+
+        const advice =
+          TA.runModel.advisor
+            .assess(run);
+
+        check(
+          advice.learningMode &&
+          advice.shouldStopTravel,
+          "Learning advisor did not stop travel at the shared fatigue threshold.",
+          advice
+        );
+
+        check(
+          advice.issues.some(
+            (issue) =>
+              issue.code ===
+              "fatigue-high"
+          ),
+          "Learning advisor did not report the fatigue reason.",
+          advice
+        );
+
+        const standardLoad =
+          TA.travel.Movement
+            .loadFactor(
+              1.2,
+              "standard"
+            );
+
+        const learningLoad =
+          TA.travel.Movement
+            .loadFactor(
+              1.2,
+              "learning"
+            );
+
+        check(
+          learningLoad >=
+            0.8999 &&
+          standardLoad >=
+            0.8999,
+          "The universal legal-load movement floor is not active.",
+          {
+            standardLoad,
+            learningLoad
+          }
+        );
+
+        const outfitWorld =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-guided-outfit-v13",
+              worldSeed:
+                "guided-outfit-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const outfitRun =
+          TA.runFactory.create(
+            {
+              routeId:
+                "tokaido",
+              professionId:
+                "scholar",
+              modeId:
+                "learning",
+              seed:
+                "guided-outfit-v13"
+            },
+            outfitWorld,
+            {
+              runId:
+                "run-guided-outfit-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        TA.economy
+          .acknowledgeBriefing(
+            outfitRun
+          );
+
+        TA.economy
+          .openDepartureStore(
+            outfitRun
+          );
+
+        const outfit =
+          TA.economy
+            .buyRecommendedPlan(
+              outfitRun
+            );
+
+        check(
+          outfit.purchased
+            .length > 0,
+          "Guided outfit completed no purchases.",
+          outfit
+        );
+
+        check(
+          outfitRun.economy
+            .funds >= 0,
+          "Guided outfit produced negative funds.",
+          outfit
+        );
+
+        const serializable =
+          TA.util
+            .inspectSerializable(
+              outfitRun
+            );
+
+        check(
+          serializable.valid,
+          "Guided outfit produced non-serializable run state.",
+          serializable
+        );
+
+        const rescueWorld =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-guided-rescue-v13",
+              worldSeed:
+                "guided-rescue-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const rescueRun =
+          TA.runFactory.create(
+            {
+              routeId:
+                "oregon-trail",
+              professionId:
+                "healer",
+              modeId:
+                "learning",
+              seed:
+                "guided-rescue-v13"
+            },
+            rescueWorld,
+            {
+              runId:
+                "run-guided-rescue-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        const rescuedMember =
+          rescueRun.party
+            .members[0];
+
+        rescuedMember.health = 0;
+
+        const rescue =
+          TA.partyActions
+            .Health
+            .loseTraveler(
+              rescueRun,
+              rescuedMember,
+              "diagnostic hardship"
+            );
+
+        check(
+          rescue.assisted &&
+          rescuedMember.alive &&
+          rescuedMember.health >=
+            TA.runModel
+              .LEARNING_ASSIST
+              .rescueHealth,
+          "Learning token still removed the traveler instead of stabilizing them.",
+          {
+            rescue,
+            member:
+              rescuedMember
+          }
+        );
+
+        const recoveryWorld =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-guided-recovery-v13",
+              worldSeed:
+                "guided-recovery-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const recoveryRun =
+          TA.runFactory.create(
+            {
+              routeId:
+                "santa-fe-trail",
+              professionId:
+                "guide",
+              modeId:
+                "learning",
+              seed:
+                "guided-recovery-v13"
+            },
+            recoveryWorld,
+            {
+              runId:
+                "run-guided-recovery-v13",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        recoveryRun.status =
+          "traveling";
+
+        recoveryRun.phase =
+          "journey";
+
+        recoveryRun.transport
+          .durability = 0;
+
+        recoveryRun.flags
+          .transportDisabled =
+          true;
+
+        const recovery =
+          TA.partyActions
+            .learningAssistance
+            .use(
+              recoveryRun
+            );
+
+        check(
+          recovery.assisted &&
+          recoveryRun.transport
+            .durability > 0 &&
+          !recoveryRun.flags
+            .transportDisabled &&
+          recoveryRun.flags
+            .emergencyRecoveryTokens ===
+            0,
+          "Emergency Learning recovery did not restore a minimal serviceable state.",
+          recovery
+        );
+
+        const recoveredSerializable =
+          TA.util
+            .inspectSerializable(
+              recoveryRun
+            );
+
+        check(
+          recoveredSerializable.valid,
+          "Emergency Learning recovery produced non-serializable state.",
+          recoveredSerializable
+        );
+
+        return {
+          patchVersion:
+            PATCH_VERSION,
+          advisorIssue:
+            advice.primary
+              .code,
+          standardLoadFactor:
+            standardLoad,
+          learningLoadFactor:
+            learningLoad,
+          guidedPurchases:
+            outfit.purchased
+              .length,
+          rescuedHealth:
+            rescuedMember
+              .health,
+          recoveredDurability:
+            recoveryRun
+              .transport
+              .durability,
+          recoveryGrants:
+            recovery.granted
+              .length
+        };
+      }
+    });
+  }
+
+  document.documentElement
+    .dataset.guidedLearningPatch =
+    PATCH_VERSION;
+})();
+</script>
+
+
+
+<script id="trail-atlas-human-winnability-v14-runtime">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_HUMAN_WINNABILITY_PATCH_V14";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.ui ||
+    !TA.game ||
+    !TA.economy ||
+    !TA.runModel ||
+    !TA.partyActions ||
+    !TA.travel ||
+    !TA.diagnostics ||
+    !TA.uiComponents ||
+    !TA.dom
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} requires the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.humanWinnabilityPatch &&
+    TA.humanWinnabilityPatch
+      .version ===
+      PATCH_VERSION
+  ) {
+    return;
+  }
+
+  const {
+    util,
+    dom,
+    ui,
+    game,
+    economy,
+    runModel,
+    partyActions,
+    uiComponents,
+    diagnostics
+  } = TA;
+
+  const {
+    button,
+    badge,
+    callout,
+    panel
+  } = uiComponents;
+
+  function currentRun() {
+    if (
+      !game.store.initialized
+    ) {
+      return null;
+    }
+
+    const world =
+      game.store.peek();
+
+    return world.activeRun ||
+      null;
+  }
+
+  function nextLegAssessment(
+    sourceRun
+  ) {
+    if (
+      !sourceRun ||
+      ![
+        "at-milestone",
+        "awaiting-choice"
+      ].includes(
+        sourceRun.status
+      ) ||
+      (
+        sourceRun.events &&
+        sourceRun.events.active
+      )
+    ) {
+      return null;
+    }
+
+    const route =
+      runModel.selectors
+        .route(
+          sourceRun
+        );
+
+    if (
+      sourceRun.progress
+        .currentMilestoneId ===
+      route.destinationMilestoneId
+    ) {
+      return null;
+    }
+
+    const routeIndex =
+      TA.content
+        .getRouteIndex(
+          route.id
+        );
+
+    const milestone =
+      routeIndex.getMilestone(
+        sourceRun.progress
+          .currentMilestoneId
+      );
+
+    if (!milestone) {
+      return null;
+    }
+
+    const planningRun =
+      util.deepClone(
+        sourceRun
+      );
+
+    const recommendations =
+      economy.recommendations(
+        planningRun
+      );
+
+    const essentialShortfalls =
+      recommendations
+        .filter(
+          (entry) =>
+            entry.priority ===
+              "essential" &&
+            Number(
+              entry.shortage
+            ) >
+              0.05
+        )
+        .sort(
+          (first, second) =>
+            second.shortage -
+            first.shortage
+        );
+
+    const recommendedShortfalls =
+      recommendations
+        .filter(
+          (entry) =>
+            entry.priority ===
+              "recommended" &&
+            Number(
+              entry.shortage
+            ) >
+              0.05
+        )
+        .sort(
+          (first, second) =>
+            second.shortage -
+            first.shortage
+        );
+
+    const plan =
+      economy.nextMarketReservePlan(
+        planningRun,
+        milestone.id
+      );
+
+    const services =
+      Array.isArray(
+        milestone.services
+      )
+        ? milestone.services
+        : [];
+
+    return {
+      routeId:
+        route.id,
+      milestoneId:
+        milestone.id,
+      milestoneName:
+        milestone.name,
+      modeId:
+        sourceRun.modeId,
+      plan,
+      recommendations,
+      essentialShortfalls,
+      recommendedShortfalls,
+      hasMarket:
+        Boolean(
+          milestone
+            .marketProfileId
+        ) &&
+        services.includes(
+          "market"
+        ),
+      ready:
+        essentialShortfalls
+          .length === 0
+    };
+  }
+
+  function advisorPanel(
+    sourceRun
+  ) {
+    const advisor =
+      runModel.advisor
+        .assess(
+          sourceRun
+        );
+
+    if (
+      !advisor ||
+      !advisor.primary
+    ) {
+      return null;
+    }
+
+    const primary =
+      advisor.primary;
+
+    return panel(
+      [
+        dom.el(
+          "div",
+          {
+            class:
+              "panel__header"
+          },
+          [
+            dom.el(
+              "div",
+              {},
+              [
+                dom.el(
+                  "p",
+                  {
+                    class:
+                      "eyebrow",
+                    text:
+                      advisor.learningMode
+                        ? "Guided Learning"
+                        : "Trail safety"
+                  }
+                ),
+                dom.el(
+                  "h2",
+                  {
+                    text:
+                      "Recommended before continuing"
+                  }
+                )
+              ]
+            ),
+            badge(
+              advisor
+                .assistanceAvailable
+                ? "Emergency recovery available"
+                : advisor
+                    .rescueTokens >
+                    0
+                  ? "Recovery reserved"
+                  : "Recovery used",
+              advisor
+                .assistanceAvailable
+                ? "warning"
+                : advisor
+                    .rescueTokens >
+                    0
+                  ? "info"
+                  : "warning"
+            )
+          ]
+        ),
+        callout(
+          primary.code
+            .replace(
+              /-/g,
+              " "
+            )
+            .replace(
+              /\b\w/g,
+              (letter) =>
+                letter.toUpperCase()
+            ),
+          primary.message,
+          primary.tone
+        ),
+        button(
+          primary.actionLabel,
+          primary.action,
+          {
+            className:
+              "button button--primary"
+          }
+        )
+      ],
+      {
+        className:
+          primary.tone ===
+            "danger"
+            ? "panel--danger"
+            : "panel--accent"
+      }
+    );
+  }
+
+  function nextLegPanel(
+    sourceRun,
+    assessment
+  ) {
+    if (
+      !assessment ||
+      (
+        assessment
+          .essentialShortfalls
+          .length === 0 &&
+        assessment
+          .recommendedShortfalls
+          .length === 0
+      )
+    ) {
+      return null;
+    }
+
+    const displayed =
+      [
+        ...assessment
+          .essentialShortfalls,
+        ...assessment
+          .recommendedShortfalls
+      ].slice(
+        0,
+        8
+      );
+
+    const planningDays =
+      Number(
+        assessment
+          .plan
+          .calendarDays
+      ) || 0;
+
+    const children = [
+      dom.el(
+        "div",
+        {
+          class:
+            "panel__header"
+        },
+        [
+          dom.el(
+            "div",
+            {},
+            [
+              dom.el(
+                "p",
+                {
+                  class:
+                    "eyebrow",
+                  text:
+                    "Next-leg readiness"
+                }
+              ),
+              dom.el(
+                "h2",
+                {
+                  text:
+                    assessment
+                      .essentialShortfalls
+                      .length
+                      ? "Restock before leaving"
+                      : "Additional reserves are recommended"
+                }
+              )
+            ]
+          ),
+          badge(
+            assessment
+              .essentialShortfalls
+              .length
+              ? `${assessment.essentialShortfalls.length} essential shortfall` +
+                `${assessment.essentialShortfalls.length === 1 ? "" : "s"}`
+              : `${assessment.recommendedShortfalls.length} recommendation` +
+                `${assessment.recommendedShortfalls.length === 1 ? "" : "s"}`,
+            assessment
+              .essentialShortfalls
+              .length
+              ? "danger"
+              : "warning"
+          )
+        ]
+      ),
+      dom.el(
+        "p",
+        {
+          text:
+            planningDays > 0
+              ? `The conservative plan allows about ${util.roundTo(planningDays, 1)} calendar days before the next dependable market across the available route options.`
+              : "Review the expedition's reserves before beginning the next stage."
+        }
+      ),
+      dom.el(
+        "ul",
+        {
+          class:
+            "data-list"
+        },
+        displayed.map(
+          (entry) =>
+            dom.el(
+              "li",
+              {
+                class:
+                  "data-row"
+              },
+              [
+                dom.el(
+                  "div",
+                  {
+                    class:
+                      "data-row__main"
+                  },
+                  [
+                    dom.el(
+                      "span",
+                      {
+                        class:
+                          "data-row__title",
+                        text:
+                          entry.name
+                      }
+                    ),
+                    dom.el(
+                      "span",
+                      {
+                        class:
+                          "data-row__description",
+                        text:
+                          entry.reason
+                      }
+                    )
+                  ]
+                ),
+                dom.el(
+                  "span",
+                  {
+                    class:
+                      "data-row__value",
+                    text:
+                      `${util.roundTo(entry.shortage, 1)} short`
+                  }
+                )
+              ]
+            )
+        )
+      )
+    ];
+
+    if (
+      assessment.hasMarket
+    ) {
+      children.push(
+        button(
+          "Open market and restock for the next stages",
+          "town.use-service",
+          {
+            className:
+              "button button--primary button--wide",
+            dataset: {
+              serviceId:
+                "market"
+            }
+          }
+        )
+      );
+    } else {
+      children.push(
+        callout(
+          "No full market is available here",
+          "Provision, reorganize cargo, rest, or deliberately continue with reduced reserves.",
+          "warning"
+        )
+      );
+    }
+
+    return panel(
+      children,
+      {
+        className:
+          assessment
+            .essentialShortfalls
+            .length
+            ? "panel--danger"
+            : "panel--accent"
+      }
+    );
+  }
+
+  const townRecord =
+    ui.screens.get(
+      "town"
+    );
+
+  let townGuardInstalled =
+    false;
+
+  if (
+    townRecord &&
+    typeof townRecord.render ===
+      "function"
+  ) {
+    const originalTownRender =
+      townRecord.render;
+
+    townRecord.render =
+      function humanReadyTownRender(
+        ...args
+      ) {
+        const node =
+          originalTownRender.apply(
+            this,
+            args
+          );
+
+        const run =
+          currentRun();
+
+        if (
+          !run ||
+          !(node instanceof Node)
+        ) {
+          return node;
+        }
+
+        const assessment =
+          nextLegAssessment(
+            run
+          );
+
+        const additions = [
+          advisorPanel(
+            run
+          ),
+          nextLegPanel(
+            run,
+            assessment
+          )
+        ].filter(
+          Boolean
+        );
+
+        if (!additions.length) {
+          return node;
+        }
+
+        const header =
+          node.querySelector(
+            ".screen-header"
+          );
+
+        const reference =
+          header
+            ? header.nextSibling
+            : node.firstChild;
+
+        for (
+          const addition of
+          additions
+        ) {
+          node.insertBefore(
+            addition,
+            reference
+          );
+        }
+
+        return node;
+      };
+
+    townGuardInstalled =
+      true;
+  }
+
+  async function confirmLegReadiness() {
+    const run =
+      currentRun();
+
+    const assessment =
+      nextLegAssessment(
+        run
+      );
+
+    if (
+      !assessment ||
+      assessment
+        .essentialShortfalls
+        .length === 0
+    ) {
+      return true;
+    }
+
+    const body =
+      dom.el(
+        "div",
+        {
+          class:
+            "stack"
+        },
+        [
+          callout(
+            "Essential reserves are below the next-stage plan",
+            "The expedition may still continue, but the successful route policy restocks these supplies before leaving a dependable market.",
+            "danger"
+          ),
+          dom.el(
+            "ul",
+            {
+              class:
+                "data-list"
+            },
+            assessment
+              .essentialShortfalls
+              .slice(
+                0,
+                8
+              )
+              .map(
+                (entry) =>
+                  dom.el(
+                    "li",
+                    {
+                      class:
+                        "data-row"
+                    },
+                    [
+                      dom.el(
+                        "div",
+                        {
+                          class:
+                            "data-row__main"
+                        },
+                        [
+                          dom.el(
+                            "span",
+                            {
+                              class:
+                                "data-row__title",
+                              text:
+                                entry.name
+                            }
+                          ),
+                          dom.el(
+                            "span",
+                            {
+                              class:
+                                "data-row__description",
+                              text:
+                                entry.reason
+                            }
+                          )
+                        ]
+                      ),
+                      dom.el(
+                        "span",
+                        {
+                          class:
+                            "data-row__value",
+                          text:
+                            `${util.roundTo(entry.shortage, 1)} short`
+                        }
+                      )
+                    ]
+                  )
+              )
+          )
+        ]
+      );
+
+    const actions = [
+      {
+        value: null,
+        label: "Cancel",
+        className:
+          "button button--quiet"
+      }
+    ];
+
+    if (
+      assessment.hasMarket
+    ) {
+      actions.push({
+        value: "market",
+        label:
+          "Open market",
+        className:
+          "button button--primary",
+        autofocus: true
+      });
+    }
+
+    actions.push({
+      value: "continue",
+      label:
+        "Continue anyway",
+      className:
+        "button button--danger-outline",
+      autofocus:
+        !assessment.hasMarket
+    });
+
+    const decision =
+      await ui.openDialog({
+        title:
+          "Leave with essential shortfalls?",
+        body,
+        actions
+      });
+
+    if (
+      decision ===
+        "market"
+    ) {
+      await game.dispatch(
+        "journey.service",
+        {
+          serviceId:
+            "market",
+          options: {}
+        }
+      );
+
+      ui.navigate(
+        "market",
+        {
+          replace: false
+        }
+      );
+
+      return false;
+    }
+
+    return decision ===
+      "continue";
+  }
+
+  function wrapDepartureAction(
+    actionId
+  ) {
+    const original =
+      ui.actions.get(
+        actionId
+      );
+
+    if (
+      typeof original !==
+        "function"
+    ) {
+      return false;
+    }
+
+    ui.actions.set(
+      actionId,
+      async function guardedDepartureAction(
+        ...args
+      ) {
+        const proceed =
+          await confirmLegReadiness();
+
+        if (!proceed) {
+          return undefined;
+        }
+
+        return original.apply(
+          this,
+          args
+        );
+      }
+    );
+
+    return true;
+  }
+
+  const continueGuardInstalled =
+    wrapDepartureAction(
+      "journey.continue"
+    );
+
+  const branchGuardInstalled =
+    wrapDepartureAction(
+      "journey.choose-segment"
+    );
+
+  const patchApi =
+    Object.freeze({
+      version:
+        PATCH_VERSION,
+      nextLegAssessment,
+      confirmLegReadiness,
+      townGuardInstalled,
+      continueGuardInstalled,
+      branchGuardInstalled
+    });
+
+  Object.defineProperty(
+    TA,
+    "humanWinnabilityPatch",
+    {
+      value:
+        patchApi,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  if (
+    !diagnostics
+      .list()
+      .some(
+        (test) =>
+          test.id ===
+          "repair.human-winnability-v14"
+      )
+  ) {
+    diagnostics.register({
+      id:
+        "repair.human-winnability-v14",
+      label:
+        "V14 human-facing load floor, route plan, safety stop, event pacing, and emergency recovery work",
+      group: "repair",
+      critical: true,
+      section: 20,
+      run({
+        assert: check
+      }) {
+        const loadFactors = {};
+
+        for (
+          const modeId of
+          [
+            "learning",
+            "standard",
+            "expedition"
+          ]
+        ) {
+          loadFactors[
+            modeId
+          ] =
+            TA.travel
+              .Movement
+              .loadFactor(
+                1.2,
+                modeId
+              );
+
+          check(
+            loadFactors[
+              modeId
+            ] >=
+              0.8999,
+            "A legal 120% load still receives the old catastrophic speed penalty.",
+            {
+              modeId,
+              factor:
+                loadFactors[
+                  modeId
+                ]
+            }
+          );
+        }
+
+        check(
+          TA.journeyBalance
+            .travelEventRate ===
+            0.08 &&
+          TA.journeyBalance
+            .campEventRate ===
+            0.04 &&
+          TA.journeyBalance
+            .afterActionEventRate ===
+            0.04 &&
+          TA.journeyBalance
+            .minimumRandomEventGapDays ===
+            7,
+          "V14 procedural-event pacing constants are not active.",
+          TA.journeyBalance
+        );
+
+        const world =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-human-winnability-v14",
+              worldSeed:
+                "human-winnability-v14",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const standardRun =
+          TA.runFactory.create(
+            {
+              routeId:
+                "tokaido",
+              professionId:
+                "scholar",
+              modeId:
+                "standard",
+              seed:
+                "human-winnability-v14-standard"
+            },
+            world,
+            {
+              runId:
+                "run-human-winnability-v14-standard",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        TA.economy
+          .acknowledgeBriefing(
+            standardRun
+          );
+
+        TA.economy
+          .openDepartureStore(
+            standardRun
+          );
+
+        const purchasePlan =
+          TA.economy
+            .buyRecommendedPlan(
+              standardRun
+            );
+
+        check(
+          purchasePlan
+            .purchased.length >
+            0,
+          "Standard mode could not use the route-plan purchase action.",
+          purchasePlan
+        );
+
+        check(
+          standardRun
+            .economy.funds >=
+            0,
+          "The Standard route-plan purchase produced negative funds.",
+          purchasePlan
+        );
+
+        standardRun.status =
+          "traveling";
+
+        standardRun.phase =
+          "journey";
+
+        standardRun.progress
+          .currentSegmentId =
+          TA.content
+            .getRouteIndex(
+              standardRun
+                .routeId
+            )
+            .outgoing(
+              standardRun
+                .progress
+                .currentMilestoneId
+            )[0].id;
+
+        for (
+          const member of
+          standardRun
+            .party.members
+        ) {
+          member.fatigue =
+            56;
+        }
+
+        const standardAdvice =
+          TA.runModel
+            .advisor
+            .assess(
+              standardRun
+            );
+
+        check(
+          !standardAdvice
+            .learningMode &&
+          standardAdvice
+            .shouldStopTravel &&
+          standardAdvice
+            .issues
+            .some(
+              (issue) =>
+                issue.code ===
+                "fatigue-high"
+            ),
+          "Standard mode did not receive the human-facing safety stop.",
+          standardAdvice
+        );
+
+        const recoveryWorld =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-emergency-recovery-v14",
+              worldSeed:
+                "emergency-recovery-v14",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const expeditionRun =
+          TA.runFactory.create(
+            {
+              routeId:
+                "santa-fe-trail",
+              professionId:
+                "guide",
+              modeId:
+                "expedition",
+              seed:
+                "human-winnability-v14-expedition"
+            },
+            recoveryWorld,
+            {
+              runId:
+                "run-human-winnability-v14-expedition",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        expeditionRun.status =
+          "traveling";
+
+        expeditionRun.phase =
+          "journey";
+
+        expeditionRun.transport
+          .durability = 0;
+
+        expeditionRun.flags
+          .transportDisabled =
+          true;
+
+        const recoveryStatus =
+          TA.partyActions
+            .learningAssistance
+            .status(
+              expeditionRun
+            );
+
+        check(
+          recoveryStatus
+            .available,
+          "Expedition mode did not expose last-resort emergency recovery.",
+          recoveryStatus
+        );
+
+        const recovery =
+          TA.partyActions
+            .learningAssistance
+            .use(
+              expeditionRun
+            );
+
+        check(
+          recovery.assisted &&
+          expeditionRun.transport
+            .durability > 0 &&
+          !expeditionRun.flags
+            .transportDisabled &&
+          expeditionRun.flags
+            .emergencyRecoveryTokens ===
+            0 &&
+          expeditionRun.metrics
+            .emergencyRecoveries ===
+            1,
+          "Emergency recovery did not restore a minimal serviceable state.",
+          {
+            recovery,
+            flags:
+              expeditionRun.flags,
+            metrics:
+              expeditionRun.metrics
+          }
+        );
+
+        const serializable =
+          util.inspectSerializable(
+            expeditionRun
+          );
+
+        check(
+          serializable.valid,
+          "Emergency recovery produced non-serializable run state.",
+          serializable
+        );
+
+        check(
+          townGuardInstalled &&
+          continueGuardInstalled &&
+          branchGuardInstalled,
+          "The town preflight or route-departure guard was not installed.",
+          {
+            townGuardInstalled,
+            continueGuardInstalled,
+            branchGuardInstalled
+          }
+        );
+
+        return {
+          patchVersion:
+            PATCH_VERSION,
+          loadFactors,
+          routePlanPurchases:
+            purchasePlan
+              .purchased
+              .length,
+          standardSafetyIssue:
+            standardAdvice
+              .primary
+              .code,
+          emergencyDurability:
+            expeditionRun
+              .transport
+              .durability,
+          townGuardInstalled,
+          continueGuardInstalled,
+          branchGuardInstalled
+        };
+      }
+    });
+  }
+
+  document.documentElement
+    .dataset.humanWinnabilityPatch =
+    PATCH_VERSION;
+})();
+</script>
+
+<script id="trail-atlas-humane-pressure-v15-diagnostics">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_HUMANE_PRESSURE_FAIL_FORWARD_PATCH_V15";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.runModel ||
+    !TA.eventEngine ||
+    !TA.partyActions ||
+    !TA.diagnostics
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} diagnostics require the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.humanePressurePatch &&
+    TA.humanePressurePatch
+      .version ===
+      PATCH_VERSION
+  ) {
+    return;
+  }
+
+  const patchApi =
+    Object.freeze({
+      version:
+        PATCH_VERSION,
+      profile:
+        TA.runModel
+          .HUMAN_PRESSURE,
+      factor:
+        TA.runModel
+          .pressure.factor
+    });
+
+  Object.defineProperty(
+    TA,
+    "humanePressurePatch",
+    {
+      value:
+        patchApi,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  if (
+    !TA.diagnostics
+      .list()
+      .some(
+        (test) =>
+          test.id ===
+          "repair.humane-pressure-v15"
+      )
+  ) {
+    TA.diagnostics.register({
+      id:
+        "repair.humane-pressure-v15",
+      label:
+        "V15 humane pressure, adverse effects, repeatable recovery, and final-traveler protection work",
+      group: "repair",
+      critical: true,
+      section: 20,
+      run({
+        assert: check
+      }) {
+        const expected = {
+          learning: {
+            consumption: 0.55,
+            fatigue: 0.45,
+            wear: 0.45,
+            health: 0.35,
+            event: 0.2
+          },
+          standard: {
+            consumption: 0.7,
+            fatigue: 0.6,
+            wear: 0.6,
+            health: 0.5,
+            event: 0.35
+          },
+          expedition: {
+            consumption: 0.85,
+            fatigue: 0.75,
+            wear: 0.75,
+            health: 0.65,
+            event: 0.5
+          }
+        };
+
+        for (
+          const [
+            modeId,
+            profile
+          ] of Object.entries(
+            expected
+          )
+        ) {
+          for (
+            const [
+              facet,
+              value
+            ] of Object.entries(
+              profile
+            )
+          ) {
+            check(
+              Math.abs(
+                TA.runModel
+                  .pressure.factor(
+                    modeId,
+                    facet
+                  ) -
+                value
+              ) <
+                1e-9,
+              "A V15 pressure factor is incorrect.",
+              {
+                modeId,
+                facet,
+                expected:
+                  value,
+                actual:
+                  TA.runModel
+                    .pressure.factor(
+                      modeId,
+                      facet
+                    )
+              }
+            );
+          }
+        }
+
+        check(
+          TA.runModel
+            .HUMAN_PRESSURE
+            .minimumRandomEventGapDays ===
+            7,
+          "The V15 random-event gap is not active."
+        );
+
+        const world =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-humane-pressure-v15",
+              worldSeed:
+                "humane-pressure-v15",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const run =
+          TA.runFactory.create(
+            {
+              routeId:
+                "santa-fe-trail",
+              professionId:
+                "guide",
+              modeId:
+                "standard",
+              seed:
+                "humane-pressure-v15-effects"
+            },
+            world,
+            {
+              runId:
+                "run-humane-pressure-v15-effects",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        run.status =
+          "traveling";
+
+        run.phase =
+          "journey";
+
+        const leader =
+          run.party.members.find(
+            (member) =>
+              member.id ===
+              run.party.leaderId
+          );
+
+        const before = {
+          health:
+            leader.health,
+          morale:
+            leader.morale,
+          fatigue:
+            leader.fatigue,
+          durability:
+            run.transport
+              .durability,
+          animalCondition:
+            run.transport
+              .animalCondition
+        };
+
+        const runtime =
+          TA.eventEngine
+            .runtimeContext(
+              run,
+              {
+                trigger:
+                  "diagnostic"
+              }
+            );
+
+        TA.eventEngine
+          .effects
+          .apply(
+            run,
+            [
+              {
+                type: "fatigue",
+                target: "leader",
+                amount: 10
+              },
+              {
+                type: "health",
+                target: "leader",
+                amount: -10
+              },
+              {
+                type: "morale",
+                target: "leader",
+                amount: -10
+              },
+              {
+                type:
+                  "transport-damage",
+                amount: 10
+              },
+              {
+                type:
+                  "animal-condition",
+                amount: -10
+              }
+            ],
+            runtime,
+            new TA.random
+              .SeededRNG(
+                "humane-pressure-v15-effect-test"
+              )
+          );
+
+        check(
+          Math.abs(
+            leader.fatigue -
+            (
+              before.fatigue +
+              6
+            )
+          ) <
+            0.001,
+          "Standard event fatigue was not scaled to 60%.",
+          {
+            before,
+            after:
+              leader.fatigue
+          }
+        );
+
+        check(
+          Math.abs(
+            leader.health -
+            (
+              before.health -
+              5
+            )
+          ) <
+            0.001,
+          "Standard negative event health was not scaled to 50%.",
+          {
+            before,
+            after:
+              leader.health
+          }
+        );
+
+        check(
+          Math.abs(
+            leader.morale -
+            (
+              before.morale -
+              5
+            )
+          ) <
+            0.001,
+          "Standard negative event morale was not scaled to 50%.",
+          {
+            before,
+            after:
+              leader.morale
+          }
+        );
+
+        check(
+          Math.abs(
+            run.transport
+              .durability -
+            (
+              before.durability -
+              6
+            )
+          ) <
+            0.001,
+          "Standard event transport damage was not scaled to 60%.",
+          {
+            before,
+            after:
+              run.transport
+                .durability
+          }
+        );
+
+        check(
+          Math.abs(
+            run.transport
+              .animalCondition -
+            (
+              before
+                .animalCondition -
+              6
+            )
+          ) <
+            0.001,
+          "Standard negative animal condition was not scaled to 60%.",
+          {
+            before,
+            after:
+              run.transport
+                .animalCondition
+          }
+        );
+
+        /*
+         * Exercise two separate hard locks. The legacy token becomes zero
+         * after the first use, but the second hard lock must remain recoverable.
+         */
+        run.transport
+          .durability = 0;
+
+        run.flags
+          .transportDisabled =
+          true;
+
+        const firstRecovery =
+          TA.partyActions
+            .learningAssistance
+            .use(
+              run
+            );
+
+        run.transport
+          .durability = 0;
+
+        run.flags
+          .transportDisabled =
+          true;
+
+        const secondStatus =
+          TA.partyActions
+            .learningAssistance
+            .status(
+              run
+            );
+
+        check(
+          secondStatus
+            .available,
+          "A second hard lock was not recoverable after the legacy token reached zero.",
+          secondStatus
+        );
+
+        const secondRecovery =
+          TA.partyActions
+            .learningAssistance
+            .use(
+              run
+            );
+
+        check(
+          firstRecovery.assisted &&
+          secondRecovery.assisted &&
+          run.flags
+            .emergencyRecoveryTokens ===
+            0 &&
+          run.flags
+            .emergencyRecoveryUses ===
+            2 &&
+          run.metrics
+            .emergencyRecoveries ===
+            2 &&
+          run.transport
+            .durability > 0 &&
+          !run.flags
+            .transportDisabled,
+          "Repeatable emergency recovery did not restore two separate hard locks.",
+          {
+            firstRecovery,
+            secondRecovery,
+            flags:
+              run.flags,
+            metrics:
+              run.metrics
+          }
+        );
+
+        const finalWorld =
+          TA.persistence
+            .createFreshWorld({
+              worldId:
+                "world-final-traveler-v15",
+              worldSeed:
+                "final-traveler-v15",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            });
+
+        const finalRun =
+          TA.runFactory.create(
+            {
+              routeId:
+                "oregon-trail",
+              professionId:
+                "provider",
+              modeId:
+                "standard",
+              seed:
+                "final-traveler-v15"
+            },
+            finalWorld,
+            {
+              runId:
+                "run-final-traveler-v15",
+              timestamp:
+                "2000-01-01T00:00:00.000Z"
+            }
+          );
+
+        for (
+          let index = 1;
+          index <
+            finalRun.party
+              .members.length;
+          index += 1
+        ) {
+          finalRun.party
+            .members[index]
+            .alive = false;
+
+          finalRun.party
+            .members[index]
+            .health = 0;
+
+          finalRun.party
+            .members[index]
+            .outcome =
+            "died";
+        }
+
+        const finalTraveler =
+          finalRun.party
+            .members[0];
+
+        finalTraveler.health = 0;
+
+        const finalProtection =
+          TA.partyActions
+            .Health
+            .loseTraveler(
+              finalRun,
+              finalTraveler,
+              "diagnostic final-traveler hardship"
+            );
+
+        check(
+          finalProtection
+            .assisted &&
+          finalProtection
+            .assistanceKind ===
+            "final-traveler-recovery" &&
+          finalTraveler.alive &&
+          finalTraveler.health >=
+            TA.runModel
+              .LEARNING_ASSIST
+              .rescueHealth &&
+          finalRun.status !==
+            "failed" &&
+          finalRun.metrics
+            .emergencyRecoveries ===
+            1,
+          "The final traveler was still permanently lost.",
+          {
+            finalProtection,
+            traveler:
+              finalTraveler,
+            status:
+              finalRun.status,
+            metrics:
+              finalRun.metrics
+          }
+        );
+
+        const serialReport =
+          TA.util
+            .inspectSerializable(
+              run
+            );
+
+        const finalSerialReport =
+          TA.util
+            .inspectSerializable(
+              finalRun
+            );
+
+        check(
+          serialReport.valid &&
+          finalSerialReport.valid,
+          "V15 recovery produced non-serializable state.",
+          {
+            serialReport,
+            finalSerialReport
+          }
+        );
+
+        return {
+          patchVersion:
+            PATCH_VERSION,
+          profile:
+            expected,
+          randomEventGapDays:
+            TA.runModel
+              .HUMAN_PRESSURE
+              .minimumRandomEventGapDays,
+          repeatableRecoveryUses:
+            run.flags
+              .emergencyRecoveryUses,
+          finalTravelerHealth:
+            finalTraveler.health,
+          serializable: true
+        };
+      }
+    });
+  }
+
+  document.documentElement
+    .dataset.humanePressurePatch =
+    PATCH_VERSION;
+})();
+</script>
+
+
+<script id="trail-atlas-solvency-logistics-v16-runtime">
+(() => {
+  "use strict";
+
+  const PATCH_VERSION =
+    "TRAIL_ATLAS_SOLVENCY_AND_LOGISTICS_PATCH_V16";
+
+  const TA =
+    window.TrailAtlas;
+
+  if (
+    !TA ||
+    !TA.economy ||
+    !TA.travel ||
+    !TA.runFactory ||
+    !TA.partyActions ||
+    !TA.diagnostics
+  ) {
+    throw new Error(
+      `${PATCH_VERSION} requires the complete Trail Atlas application.`
+    );
+  }
+
+  if (
+    TA.solvencyLogisticsPatch &&
+    TA.solvencyLogisticsPatch
+      .version ===
+      PATCH_VERSION
+  ) {
+    return;
+  }
+
+  const patchApi =
+    Object.freeze({
+      version:
+        PATCH_VERSION,
+      startingFundsVersion:
+        TA.economy
+          .STARTING_FUNDS_BALANCE_VERSION,
+      safeLoadRatio:
+        TA.economy
+          .SAFE_RECOMMENDED_LOAD_RATIO,
+      solvencyMargins:
+        TA.economy
+          .SOLVENCY_MARGIN_FACTORS,
+      waterAccessThreshold:
+        TA.economy
+          .GUARANTEED_WATER_ACCESS_THRESHOLD,
+      waterGapSpanDays:
+        TA.economy
+          .WATER_SOURCE_GAP_SPAN_DAYS,
+      waterDelayReserveDays:
+        TA.economy
+          .WATER_DELAY_RESERVE_DAYS
+    });
+
+  Object.defineProperty(
+    TA,
+    "solvencyLogisticsPatch",
+    {
+      value:
+        patchApi,
+      writable: false,
+      configurable: false,
+      enumerable: true
+    }
+  );
+
+  function applyCorrectStartingFunds(
+    run
+  ) {
+    const quote =
+      TA.economy
+        .startingFundsQuoteForRun(
+          run
+        );
+
+    return TA.economy
+      .applyStartingFundsQuote(
+        run,
+        quote,
+        {
+          recordTransaction:
+            false
+        }
+      );
+  }
+
+  function resolveUnexpectedEvent(
+    run,
+    check
+  ) {
+    let guard = 0;
+
+    while (
+      run.events &&
+      run.events.active
+    ) {
+      guard += 1;
+
+      check(
+        guard < 20,
+        "V16 smoke event queue did not settle.",
+        {
+          eventId:
+            run.events
+              .active.eventId
+        }
+      );
+
+      const view =
+        TA.eventEngine.view(
+          run
+        );
+
+      const choice =
+        view &&
+        view.choices.find(
+          (candidate) =>
+            candidate.enabled
+        );
+
+      check(
+        Boolean(choice),
+        "V16 smoke event had no enabled choice.",
+        view
+      );
+
+      TA.eventEngine.resolve(
+        run,
+        choice.id
+      );
+    }
+  }
+
+  function fortLaramieRun(
+    profession,
+    mode,
+    check
+  ) {
+    const routeId =
+      "oregon-trail";
+
+    const world =
+      TA.persistence
+        .createFreshWorld({
+          worldId:
+            `world-v16-fort-laramie-${profession.id}-${mode.id}`,
+          worldSeed:
+            `v16-fort-laramie-${profession.id}-${mode.id}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        });
+
+    const run =
+      TA.runFactory.create(
+        {
+          routeId,
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          seed:
+            `v16-fort-laramie:${profession.id}:${mode.id}`
+        },
+        world,
+        {
+          runId:
+            `run-v16-fort-laramie-${profession.id}-${mode.id}`,
+          timestamp:
+            "2000-01-01T00:00:00.000Z"
+        }
+      );
+
+    applyCorrectStartingFunds(
+      run
+    );
+
+    /*
+     * TRAIL_ATLAS_V16_ESSENTIAL_STOCK_AND_SMOKE_HOTFIX
+     *
+     * The Fort Laramie regression must arrive with the durable equipment a
+     * normal player buys at Independence. Teleporting an un-outfitted party
+     * to a limited fort market incorrectly required Fort Laramie to act like
+     * the full departure outfitter.
+     */
+    TA.economy
+      .acknowledgeBriefing(
+        run
+      );
+
+    TA.economy
+      .openDepartureStore(
+        run
+      );
+
+    const departurePurchase =
+      TA.economy
+        .buyRecommendedPlan(
+          run
+        );
+
+    check(
+      departurePurchase
+        .essentialSkipped
+        .length === 0,
+      `The V16 smoke party could not buy its essential Independence outfit: ` +
+        departurePurchase
+          .essentialSkipped
+          .map(
+            (entry) =>
+              `${entry.itemId} (${(entry.reasons || []).join(" / ")})`
+          )
+          .join("; "),
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        departurePurchase
+      }
+    );
+
+    TA.economy
+      .closeMarket(
+        run
+      );
+
+    run.flags.departed =
+      true;
+
+    run.status =
+      "at-milestone";
+
+    run.phase =
+      "town";
+
+    run.progress
+      .currentMilestoneId =
+      "fort-laramie";
+
+    if (
+      !run.progress
+        .visitedMilestoneIds
+        .includes(
+          "fort-laramie"
+        )
+    ) {
+      run.progress
+        .visitedMilestoneIds
+        .push(
+          "fort-laramie"
+        );
+    }
+
+    run.progress
+      .currentSegmentId =
+      null;
+
+    run.progress
+      .segmentProgressKm =
+      0;
+
+    /*
+     * Keep this regression focused on logistics. Random procedural events
+     * remain tested elsewhere; forced milestone events still work normally.
+     */
+    run.events
+      .lastTriggeredDay =
+      1000000000;
+
+    TA.economy.openMarket(
+      run,
+      "fort-laramie",
+      {
+        allowRemote: true,
+        allowWithoutBriefing:
+          true,
+        forceNew: true
+      }
+    );
+
+    const recommendations =
+      TA.economy
+        .recommendations(
+          run
+        );
+
+    const impossibleEssentials =
+      recommendations.filter(
+        (entry) =>
+          entry.priority ===
+            "essential" &&
+          Number(
+            entry.capacityDeferred
+          ) >
+            0.0001
+      );
+
+    check(
+      impossibleEssentials
+        .length === 0,
+      "Fort Laramie still produced an essential recommendation that could not fit.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        impossibleEssentials
+      }
+    );
+
+    const purchase =
+      TA.economy
+        .buyRecommendedPlan(
+          run
+        );
+
+    check(
+      purchase
+        .essentialSkipped
+        .length === 0,
+      `Fort Laramie could not purchase its essential next-stage plan: ` +
+        purchase
+          .essentialSkipped
+          .map(
+            (entry) =>
+              `${entry.itemId} (${(entry.reasons || []).join(" / ")})`
+          )
+          .join("; "),
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        purchase
+      }
+    );
+
+    const load =
+      TA.runModel
+        .Transport
+        .loadState(
+          run
+        );
+
+    check(
+      load.ratio <=
+        TA.economy
+          .SAFE_RECOMMENDED_LOAD_RATIO +
+          0.0001,
+      "Fort Laramie route plan exceeded the V16 safe-load ratio.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        load,
+        recommendations
+      }
+    );
+
+    check(
+      run.economy.funds >=
+        -0.0001,
+      "Fort Laramie route plan produced negative funds.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        funds:
+          run.economy.funds
+      }
+    );
+
+    TA.economy.closeMarket(
+      run
+    );
+
+    TA.travel.beginSegment(
+      run,
+      "laramie-to-independence-rock"
+    );
+
+    let guard = 0;
+
+    while (
+      run.status ===
+        "traveling"
+    ) {
+      guard += 1;
+
+      check(
+        guard < 90,
+        "Fort Laramie to Independence Rock exceeded the V16 smoke safety limit.",
+        {
+          professionId:
+            profession.id,
+          modeId:
+            mode.id,
+          day:
+            run.calendar.dayIndex,
+          supplies:
+            TA.runModel
+              .selectors
+              .supplyForecast(
+                run
+              )
+        }
+      );
+
+      resolveUnexpectedEvent(
+        run,
+        check
+      );
+
+      const averageFatigue =
+        TA.runModel.Party
+          .average(
+            run,
+            "fatigue",
+            0
+          );
+
+      if (
+        averageFatigue >=
+          58
+      ) {
+        TA.partyActions.rest(
+          run,
+          {
+            days: 1
+          }
+        );
+
+        continue;
+      }
+
+      TA.travel.travelDay(
+        run
+      );
+    }
+
+    resolveUnexpectedEvent(
+      run,
+      check
+    );
+
+    check(
+      run.progress
+        .currentMilestoneId ===
+        "independence-rock",
+      "The V16 recommended plan did not reach Independence Rock.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        status:
+          run.status,
+        milestoneId:
+          run.progress
+            .currentMilestoneId
+      }
+    );
+
+    check(
+      TA.runModel.Party
+        .alive(run)
+        .length > 0,
+      "No traveler survived the V16 Fort Laramie regression.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id
+      }
+    );
+
+    check(
+      !run.flags
+        .transportDisabled,
+      "Transport was disabled during the V16 Fort Laramie regression.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        durability:
+          run.transport
+            .durability,
+        animalCondition:
+          run.transport
+            .animalCondition
+      }
+    );
+
+    const waterShortfall =
+      run.journal.entries.some(
+        (entry) =>
+          entry.type ===
+            "supply-shortfall" &&
+          entry.tags.includes(
+            "water"
+          )
+      );
+
+    const foodShortfall =
+      run.journal.entries.some(
+        (entry) =>
+          entry.type ===
+            "supply-shortfall" &&
+          entry.tags.includes(
+            "food"
+          )
+      );
+
+    check(
+      !waterShortfall &&
+      !foodShortfall,
+      "The V16 Fort Laramie plan reached Independence Rock only after a food or water shortfall.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        waterShortfall,
+        foodShortfall,
+        journal:
+          run.journal.entries
+            .slice(-10)
+      }
+    );
+
+    check(
+      (
+        Number(
+          run.metrics
+            .emergencyRecoveries
+        ) || 0
+      ) === 0,
+      "The V16 Fort Laramie regression required emergency recovery.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        emergencyRecoveries:
+          run.metrics
+            .emergencyRecoveries
+      }
+    );
+
+    const path =
+      run.progress
+        .pathHistory[
+        run.progress
+          .pathHistory
+          .length - 1
+      ];
+
+    check(
+      Number(
+        path &&
+        path.routeWaterRefills
+      ) > 0,
+      "The actual travel engine did not use its planned in-segment water opportunities.",
+      {
+        professionId:
+          profession.id,
+        modeId:
+          mode.id,
+        path
+      }
+    );
+
+    const serializable =
+      TA.util
+        .inspectSerializable(
+          run
+        );
+
+    check(
+      serializable.valid,
+      "The V16 Fort Laramie regression produced non-serializable state.",
+      serializable
+    );
+
+    return {
+      professionId:
+        profession.id,
+      modeId:
+        mode.id,
+      days:
+        run.calendar.dayIndex,
+      loadRatio:
+        load.ratio,
+      fundsRemaining:
+        run.economy.funds,
+      routeWaterRefills:
+        path.routeWaterRefills,
+      waterRemaining:
+        TA.runModel.Inventory
+          .quantity(
+            run.inventory,
+            "water"
+          )
+    };
+  }
+
+  if (
+    !TA.diagnostics
+      .list()
+      .some(
+        (test) =>
+          test.id ===
+          "repair.solvency-logistics-v16"
+      )
+  ) {
+    TA.diagnostics.register({
+      id:
+        "repair.solvency-logistics-v16",
+      label:
+        "V16 funds, safe load, and Fort Laramie to Independence Rock survivability work",
+      group: "repair",
+      critical: true,
+      section: 20,
+      run({
+        assert: check
+      }) {
+        check(
+          TA.economy
+            .STARTING_FUNDS_BALANCE_VERSION ===
+            PATCH_VERSION,
+          "The V16 starting-funds marker is not active."
+        );
+
+        check(
+          TA.economy
+            .SAFE_RECOMMENDED_LOAD_RATIO ===
+            0.95,
+          "The V16 recommendation load ratio is not active."
+        );
+
+        const results = [];
+
+        for (
+          const profession of
+          TA.content.list(
+            "professions"
+          )
+        ) {
+          for (
+            const mode of
+            TA.content.list(
+              "modes"
+            )
+          ) {
+            results.push(
+              fortLaramieRun(
+                profession,
+                mode,
+                check
+              )
+            );
+          }
+        }
+
+        return {
+          patchVersion:
+            PATCH_VERSION,
+          combinations:
+            results.length,
+          expected:
+            TA.content
+              .registry(
+                "professions"
+              )
+              .size *
+            TA.content
+              .registry(
+                "modes"
+              )
+              .size,
+          safeLoadRatio:
+            TA.economy
+              .SAFE_RECOMMENDED_LOAD_RATIO,
+          solvencyMargins:
+            TA.economy
+              .SOLVENCY_MARGIN_FACTORS,
+          results
+        };
+      }
+    });
+  }
+
+  if (
+    !TA.diagnostics
+      .list()
+      .some(
+        (test) =>
+          test.id ===
+          "balance.v16-solvency-capacity-matrix"
+      )
+  ) {
+    TA.diagnostics.register({
+      id:
+        "balance.v16-solvency-capacity-matrix",
+      label:
+        "Every route, profession, and mode can afford and carry its departure essentials",
+      group: "balance",
+      critical: true,
+      section: 20,
+      async run({
+        assert: check
+      }) {
+        const results = [];
+        let sequence = 0;
+
+        for (
+          const route of
+          TA.content.list(
+            "routes"
+          )
+        ) {
+          for (
+            const profession of
+            TA.content.list(
+              "professions"
+            )
+          ) {
+            for (
+              const mode of
+              TA.content.list(
+                "modes"
+              )
+            ) {
+              sequence += 1;
+
+              const world =
+                TA.persistence
+                  .createFreshWorld({
+                    worldId:
+                      `world-v16-matrix-${route.id}-${profession.id}-${mode.id}`,
+                    worldSeed:
+                      `v16-matrix-${route.id}-${profession.id}-${mode.id}`,
+                    timestamp:
+                      "2000-01-01T00:00:00.000Z"
+                  });
+
+              const run =
+                TA.runFactory.create(
+                  {
+                    routeId:
+                      route.id,
+                    professionId:
+                      profession.id,
+                    modeId:
+                      mode.id,
+                    seed:
+                      `v16-matrix:${route.id}:${profession.id}:${mode.id}`
+                  },
+                  world,
+                  {
+                    runId:
+                      `run-v16-matrix-${route.id}-${profession.id}-${mode.id}`,
+                    timestamp:
+                      "2000-01-01T00:00:00.000Z"
+                  }
+                );
+
+              applyCorrectStartingFunds(
+                run
+              );
+
+              TA.economy
+                .acknowledgeBriefing(
+                  run
+                );
+
+              TA.economy
+                .openDepartureStore(
+                  run
+                );
+
+              const recommendations =
+                TA.economy
+                  .recommendations(
+                    run
+                  );
+
+              const impossibleEssentials =
+                recommendations.filter(
+                  (entry) =>
+                    entry.priority ===
+                      "essential" &&
+                    Number(
+                      entry.capacityDeferred
+                    ) >
+                      0.0001
+                );
+
+              check(
+                impossibleEssentials
+                  .length === 0,
+                "A departure plan still contains an uncarryable essential recommendation.",
+                {
+                  routeId:
+                    route.id,
+                  professionId:
+                    profession.id,
+                  modeId:
+                    mode.id,
+                  impossibleEssentials
+                }
+              );
+
+              const purchase =
+                TA.economy
+                  .buyRecommendedPlan(
+                    run
+                  );
+
+              check(
+                purchase
+                  .essentialSkipped
+                  .length === 0,
+                "A departure plan could not buy every essential recommendation.",
+                {
+                  routeId:
+                    route.id,
+                  professionId:
+                    profession.id,
+                  modeId:
+                    mode.id,
+                  purchase
+                }
+              );
+
+              const load =
+                TA.runModel
+                  .Transport
+                  .loadState(
+                    run
+                  );
+
+              check(
+                load.ratio <=
+                  TA.economy
+                    .SAFE_RECOMMENDED_LOAD_RATIO +
+                  0.0001,
+                "A departure recommendation exceeded the safe load ratio.",
+                {
+                  routeId:
+                    route.id,
+                  professionId:
+                    profession.id,
+                  modeId:
+                    mode.id,
+                  load
+                }
+              );
+
+              check(
+                run.economy.funds >=
+                  -0.0001,
+                "A departure recommendation produced negative funds.",
+                {
+                  routeId:
+                    route.id,
+                  professionId:
+                    profession.id,
+                  modeId:
+                    mode.id,
+                  funds:
+                    run.economy.funds
+                }
+              );
+
+              results.push({
+                routeId:
+                  route.id,
+                professionId:
+                  profession.id,
+                modeId:
+                  mode.id,
+                startingFunds:
+                  run.economy
+                    .startingFunds,
+                fundsRemaining:
+                  run.economy
+                    .funds,
+                loadRatio:
+                  load.ratio,
+                modeledJourneyCost:
+                  run.economy
+                    .journeyBudgetPlan
+                    .modeledJourneyCost,
+                solvencyReserve:
+                  run.economy
+                    .journeyBudgetPlan
+                    .solvencyReserve
+              });
+
+              if (
+                sequence % 24 ===
+                0
+              ) {
+                await TA.util.sleep(
+                  0
+                );
+              }
+            }
+          }
+        }
+
+        return {
+          combinations:
+            results.length,
+          expected:
+            TA.content
+              .registry(
+                "routes"
+              )
+              .size *
+            TA.content
+              .registry(
+                "professions"
+              )
+              .size *
+            TA.content
+              .registry(
+                "modes"
+              )
+              .size,
+          results
+        };
+      }
+    });
+  }
+
+  document.documentElement
+    .dataset.solvencyLogisticsPatch =
+    PATCH_VERSION;
+})();
+</script>
+
+
 </body>
 </html>
