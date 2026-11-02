@@ -2,6 +2,4 @@
 
 
 ===
-EARLY DEMONSTRATION
-
-This application is more or less in a playable state, but needs additional testing to confirm play-ability for all routes and challenge levels. 
+This application has been play tested and is reasonably balanced for casual play. Some graphical issues need to be corrected, but nothing that would break the game.
